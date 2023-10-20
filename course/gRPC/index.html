@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>JavaScript</title>
+
+		<link rel="stylesheet" href="../../dist/reveal.css">
+		<link rel="stylesheet" href="../..//dist/theme/white.css" id="theme">
+
+        <link rel="stylesheet" href="../../plugin/highlight/monokai.css">
+		<link rel="stylesheet" href="../course.css">
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<div class="slides size">
+                <!-- Slides are separated by three dashes (the default) -->
+                <section data-markdown="markdown.md" data-transition="convex"></section>
+            </div>
+		</div>
+
+		<script src="../../dist/reveal.js"></script>
+        <script src="../../plugin/markdown/markdown.js"></script>
+        <script src="../../plugin/highlight/highlight.js"></script>
+        <script src="../../plugin/notes/notes.js"></script>
+        <script src="../../plugin/math/math.js"></script>
+
+		<script>
+
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+				slideNumber: 'c/t',
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealMath.KaTeX ],
+				notes_pointer: {
+        		pointer: {
+            		size: 15,  // in pixels (scaled like the rest of reveal.js)
+            		color: 'rgba(255, 0, 0, 0.8)',  // something valid for css background-color
+            		key: 'A'
+        				},
+        		},
+
+    			dependencies: [
+        		// ...
+
+		        {src: '../../node_modules/reveal.js-notes-pointer/notes-pointer.js'}
+        			// async is optional
+    			]
+			});
+
+		</script>
+
+	</body>
+</html>

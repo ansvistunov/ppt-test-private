@@ -65,7 +65,7 @@ protoc --plugin=protoc-gen-grpc-java="путь до плагина" \
 ---
 ### Hello. Кодогенерация
 Для кодогенерации может быть использован плагин для соответствующей системы сборки, например для maven:
-```xml 
+```xml [1-31]
 <extensions>
     <extension>
         <groupId>kr.motd.maven</groupId>
@@ -73,20 +73,15 @@ protoc --plugin=protoc-gen-grpc-java="путь до плагина" \
         <version>1.6.1</version>
     </extension>
 </extensions>
-
 <plugins>
     <plugin>
         <groupId>org.xolstice.maven.plugins</groupId>
         <artifactId>protobuf-maven-plugin</artifactId>
         <version>0.6.1</version>
         <configuration>
-            <protocArtifact>
-                com.google.protobuf:protoc:3.3.0:exe:${os.detected.classifier}
-            </protocArtifact>
+            <protocArtifact>com.google.protobuf:protoc:3.3.0:exe:${os.detected.classifier}</protocArtifact>
             <pluginId>grpc-java</pluginId>
-            <pluginArtifact>
-                io.grpc:protoc-gen-grpc-java:1.4.0:exe:${os.detected.classifier}
-            </pluginArtifact>
+            <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.4.0:exe:${os.detected.classifier}</pluginArtifact>
         </configuration>
         <executions>
             <execution>
@@ -216,8 +211,7 @@ import io.grpc.*;
 import java.util.Scanner;
 public class EchoClient {
     public static void main(String[] args) {
-        EchoServiceGrpc.EchoServiceBlockingStub client 
-                                    = createClient("localhost",8080);
+        EchoServiceGrpc.EchoServiceBlockingStub client = createClient("localhost",8080);
         Scanner console = new Scanner(System.in);
         String message;
         while((message = console.nextLine())!=null){
@@ -227,8 +221,7 @@ public class EchoClient {
             System.out.println("response="+response.getMessage());
         }
     }
-    private static EchoServiceGrpc.EchoServiceBlockingStub 
-                                createClient(String host, int port){
+    private static EchoServiceGrpc.EchoServiceBlockingStub  createClient(String host, int port){
         Channel channel = ManagedChannelBuilder.forAddress(host,port)
                 .usePlaintext()
                 .build();
@@ -452,12 +445,10 @@ message GetCardBalanceResponse{ //Типы для передачи сообще�
     double balance = 1;
 }
 service BillingService{         //Определение интерфейса сервиса
-                                                //возврат void
-    rpc addNewCard(AddNewCardRequest) returns (google.protobuf.Empty); 
+    rpc addNewCard(AddNewCardRequest) returns (google.protobuf.Empty); //возврат void
     rpc addMoney(MoneyRequest) returns (google.protobuf.Empty);
     rpc subMoney(MoneyRequest) returns (google.protobuf.Empty);
-    rpc getCardBalance(GetCardBalanceRequest) returns (GetCardBalanceResponse);
-}
+    rpc getCardBalance(GetCardBalanceRequest) returns (GetCardBalanceResponse); }
 ```
 ---
 ## Реализация сервера (1)
@@ -475,8 +466,7 @@ public class BillingService extends BillingServiceGrpc.BillingServiceImplBase {
     Map<String, Double> cards = new ConcurrentHashMap<>();
     public void addNewCard(grpc.AddNewCardRequest request,
                            io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
-        cards.putIfAbsent(request.getCard(),0.0);
-        System.out.println("card added:"+cards);
+        cards.putIfAbsent(request.getCard(),0.0); System.out.println("card added:"+cards);
         responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
@@ -501,9 +491,8 @@ public class BillingService extends BillingServiceGrpc.BillingServiceImplBase {
     }
     public void getCardBalance(grpc.GetCardBalanceRequest request,
                                io.grpc.stub.StreamObserver<grpc.GetCardBalanceResponse> responseObserver) {
-        GetCardBalanceResponse response = GetCardBalanceResponse.newBuilder()
-                .setBalance(cards.get(request.getCard()))
-                .build();
+        GetCardBalanceResponse response = GetCardBalanceResponse.newBuilder().setBalance(cards.get(request.getCard()))
+                                                                .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
@@ -587,8 +576,7 @@ message GetCardBalanceResponse{
 service BillingService{
     rpc addNewCard(AddNewCardRequest) returns (google.protobuf.Empty);
     rpc processOperation(stream MoneyRequest) returns (google.protobuf.Empty);
-    rpc getCardBalance(GetCardBalanceRequest) returns (GetCardBalanceResponse);
-}
+    rpc getCardBalance(GetCardBalanceRequest) returns (GetCardBalanceResponse);}
 ```
 ---
 ## Прием потока(stream) на сервере
@@ -608,7 +596,7 @@ public io.grpc.stub.StreamObserver<grpc.ex2.MoneyRequest> processOperation(
     - onError вызывается при возникновении ошибки 
 ---
 ## Реализация сервера (1)
-```java
+```java [1-28]
 package grpcex2;
 import com.google.protobuf.Empty;
 import grpc.*;
@@ -620,11 +608,8 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public class BillingService extends BillingServiceGrpc.BillingServiceImplBase {
     public static void main(String[] args) throws Exception{
-        Server server = ServerBuilder
-                .forPort(8080)
-                .addService(new BillingService()).build();
-        server.start();
-        System.out.println("Server started");
+        Server server = ServerBuilder.forPort(8080).addService(new BillingService()).build();
+        server.start();  System.out.println("Server started");
         server.awaitTermination();
     }
     Map<String, Double> cards = new ConcurrentHashMap<>();
@@ -642,34 +627,22 @@ public class BillingService extends BillingServiceGrpc.BillingServiceImplBase {
 public void getCardBalance(grpc.GetCardBalanceRequest request,
         io.grpc.stub.StreamObserver<grpc.GetCardBalanceResponse> responseObserver){
         GetCardBalanceResponse response = GetCardBalanceResponse.newBuilder()
-                .setBalance(cards.get(request.getCard()))
-                .build();
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
+                .setBalance(cards.get(request.getCard())).build();
+        responseObserver.onNext(response); responseObserver.onCompleted();
     }
 public io.grpc.stub.StreamObserver<grpc.MoneyRequest> processOperation(
         io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver){
     return new StreamObserver<MoneyRequest>() {
-        long count = 0;
-        long startTime = System.nanoTime();
-        @Override
-        public void onNext(MoneyRequest moneyRequest) {
-            cards.computeIfPresent(moneyRequest.getCard(),
-                                    (key,value)->value + moneyRequest.getMoney());
-            count++;
+        long count = 0;  long startTime = System.nanoTime();
+        @Override public void onNext(MoneyRequest moneyRequest) {
+            cards.computeIfPresent(moneyRequest.getCard(), (key,value)->value + moneyRequest.getMoney()); count++;
         }
-        @Override
-        public void onError(Throwable throwable) {
-            throwable.printStackTrace();
-        }
-        @Override
-        public void onCompleted() {
-            System.out.println(String
-                .format("Stream complete. elements count=%s, seconds=%s",
+        @Override public void onError(Throwable throwable) {throwable.printStackTrace();}
+        @Override public void onCompleted() {
+            System.out.println(String.format("Stream complete. elements count=%s, seconds=%s",
                  count, NANOSECONDS.toSeconds(System.nanoTime() - startTime)));
             System.out.println("cards="+cards);
-            responseObserver.onNext(Empty.newBuilder().build());
-            responseObserver.onCompleted();
+            responseObserver.onNext(Empty.newBuilder().build()); responseObserver.onCompleted();
         }
     };
 }
@@ -689,9 +662,9 @@ public void getCardBalance(grpc.ex2.GetCardBalanceRequest request,
     io.grpc.stub.StreamObserver<grpc.ex2.GetCardBalanceResponse> responseObserver)
 ```
 ---
-## Клиент. Класс для отслеживания результата вызова 
+## Клиент. Отслеживание результата вызова 
 
-```java 
+```java [1-25]
 package grpcex2;
 import io.grpc.stub.StreamObserver;
 import java.util.concurrent.CountDownLatch;
@@ -700,8 +673,7 @@ public class WaitObserver<T> implements StreamObserver<T> {
     private final CountDownLatch latch; //Барьер
     private final Consumer<T> consumer; //Вызываем при приходе сообщения
     public WaitObserver(CountDownLatch latch, Consumer<T> consumer){
-        this.latch = latch;
-        this.consumer = consumer;
+        this.latch = latch;  this.consumer = consumer;
     }
     @Override                   //Вызывается при приходе сообщения от сервера
     public void onNext(T t) {
@@ -739,30 +711,22 @@ import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 import java.util.concurrent.*;
 public class BillingClient {
-    private static BillingServiceGrpc.BillingServiceStub 
-                                        createClient(String host, int port){
-        Channel channel = ManagedChannelBuilder.forAddress(host,port)
-                .usePlaintext()
-                .build();
+    private static BillingServiceGrpc.BillingServiceStub createClient(String host, int port){
+        Channel channel = ManagedChannelBuilder.forAddress(host,port).usePlaintext().build();
         return BillingServiceGrpc.newStub(channel); //для неблокирующих
     }
     public static void main(String[] args) throws Exception{
         final int cardCount = 5, operationCount = 100000;
-        BillingServiceGrpc.BillingServiceStub 
-                                asyncClient = createClient("localhost",8080);
-        System.out.println("Connected to server");
+        BillingServiceGrpc.BillingServiceStub asyncClient = createClient("localhost",8080);
         //барьер для ожидания завершения указанного количества вызовов
         final CountDownLatch addCardsLatch = new CountDownLatch(cardCount);
         WaitObserver<Empty> observer = new WaitObserver<>(addCardsLatch, t->{});
         for (int i = 1; i <= cardCount; i++) {
-            AddNewCardRequest cardRequest =  AddNewCardRequest.newBuilder()
-                                            .setCard(String.valueOf(i))
-                                            .setPersonname("Client "+i)
-                                            .build();
+            AddNewCardRequest cardRequest = AddNewCardRequest.newBuilder()
+                                            .setCard(String.valueOf(i)).setPersonname("Client "+i).build();
             asyncClient.addNewCard(cardRequest,observer);//неблокирующий вызов
         }
-        //ожидание завершения ВСЕХ вызовов
-        addCardsLatch.await(1, TimeUnit.MINUTES); 
+        addCardsLatch.await(1, TimeUnit.MINUTES); //ожидание завершения ВСЕХ вызовов
 ```
 ---
 ## Реализация клиента (2)
@@ -780,14 +744,12 @@ public class BillingClient {
         }
         requestObserver.onCompleted();
         operationLatch.await(1, TimeUnit.MINUTES);
-
         final CountDownLatch balanceLatch = new CountDownLatch(cardCount);
         WaitObserver<GetCardBalanceResponse> balanceObserver = new WaitObserver<>(balanceLatch, 
                                 t->System.out.println("balance="+t.getBalance()));
         for (int i = 1; i <= cardCount; i++) {
             GetCardBalanceRequest cardBalanceRequest = GetCardBalanceRequest.newBuilder()
-                                                .setCard(String.valueOf(i))
-                                                .build();
+                                                .setCard(String.valueOf(i)).build();
             asyncClient.getCardBalance(cardBalanceRequest, balanceObserver);
         }
         balanceLatch.await(1, TimeUnit.MINUTES);

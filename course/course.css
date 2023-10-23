@@ -14,10 +14,14 @@
     width: 80%;
   }
   table {
-    font-size:medium;
+    font-size:small;
   }
 
   .small_image {
     height: 80%;
+  }
+
+  .reveal pre code {
+    max-height: 500px;
   }
   

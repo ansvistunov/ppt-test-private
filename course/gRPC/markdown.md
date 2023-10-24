@@ -177,7 +177,7 @@ public interface StreamObserver<V> {
      - addService(BindableService bindableService) – добавляет реализацию сервиса
      - build() – завершает создание сервера
 ---
-## Hello. Сервер
+### Hello. Сервер
 
 ```java [1-22|5|15|16|17|18|19|20|7-8|9-10|11|12]
 package hello;
@@ -204,7 +204,7 @@ public class EchoServer extends EchoServiceGrpc.EchoServiceImplBase {
 }
 ```
 ---
-## Hello. Клиент
+### Hello. Клиент
 
 ```java [1-23|7|18-20|21|11-12|13|14]
 package hello;
@@ -232,7 +232,7 @@ public class EchoClient {
 }
 ```
 ---
-## Hello. Компиляция и запуск
+### Hello. Компиляция и запуск
  - Для компиляции и запуска нужны библиотеки с реализацией необходимых пакетов.
  - Список зависимостей для maven ([https://github.com/grpc/grpc-java](https://github.com/grpc/grpc-java)):
 
@@ -260,7 +260,7 @@ public class EchoClient {
 
 ```
 ---
-## Hello. Компиляция и запуск
+### Hello. Компиляция и запуск
  - Запуск с использованием системы сборки maven:
      - сервер
 ```bash
@@ -271,7 +271,7 @@ mvn exec:java -Dexec.mainClass=hello.EchoServer
 mvn exec:java -Dexec.mainClass=hello.EchoClient
 ```
 ---
-## Protocol Buffers IDL (скалярные типы)
+### Protocol Buffers IDL (скалярные типы)
 |proto|Комментарий|тип Java|
 |-----|-----------|----|
 |float|     	|float|
@@ -290,7 +290,7 @@ mvn exec:java -Dexec.mainClass=hello.EchoClient
 |string|	Строка всегда должна содержать текст в кодировке UTF-8 или 7-битный ASCII и не может быть длиннее 2^32.|	String|
 |bytes|	Может содержать любую произвольную последовательность байтов не более 2^32.	|ByteString|
 ---
-## Protocol Buffers IDL (сообщения)
+### Protocol Buffers IDL (сообщения)
 ```proto
 /* SearchRequest represents a search query, with pagination options to
  * indicate which results to include in the response. */
@@ -308,7 +308,7 @@ message Foo {                   //Резервирование полей для
 } 
 ```
 ---
-## Protocol Buffers IDL (перечислимый тип)
+### Protocol Buffers IDL (перечислимый тип)
 ```proto 
 message SearchRequest {         //Имя типа 
     string query = 1;
@@ -327,7 +327,7 @@ message SearchRequest {         //Имя типа
 } 
 ```
 ---
-## Protocol Buffers IDL (Вложенные типы)
+### Protocol Buffers IDL (Вложенные типы)
 
 ```proto
 message SearchResponse {            //Имя типа
@@ -341,7 +341,7 @@ message SearchResponse {            //Имя типа
 
 ```
 ---
-## Protocol Buffers IDL (oneOf – запись с вариантами)
+### Protocol Buffers IDL (oneOf – запись с вариантами)
 
 ```proto
 message SampleMessage {
@@ -367,7 +367,7 @@ message.mutable_sub_message();   // Will clear name field.
 CHECK(!message.has_name());
 ```
 ---
-## Protocol Buffers IDL (хэш-таблицы)
+### Protocol Buffers IDL (хэш-таблицы)
 ```proto
 message Project {
     int32 page_number = 2;
@@ -381,7 +381,7 @@ message SampleMessage {
 
 ```
 ---
-## Protocol Buffers IDL (определение сервиса)
+### Protocol Buffers IDL (определение сервиса)
 
 ```proto
 //Без стриминга
@@ -403,25 +403,25 @@ service SearchService {
 
 ```
 ---
-## gRPC. Предварительные итоги
+### gRPC. Предварительные итоги
  - Еще одна (современная, мультиплатформенная, быстрая, …) реализация RPC
  - Обладает развитым языком описания интерфейсов (IDL)
  - Проста в использовании, есть много документации (элементарное введение здесь: [https://grpc.io/docs/languages/java/basics/](https://grpc.io/docs/languages/java/basics/))
  - Java – одна из целевых платформ => хорошая поддержка, много инструментов и т.д.
 
 ---
-## Расширенные примеры
+### Расширенные примеры
  - Реализация программы обслуживания сети столовых, с использованием gRPC:
      - Пример 1: определяется интерфейс, содержащий методы, осуществляющие базовые единичные операции (блокирующие вызовы)
      - Пример 2: интерфейс содержит методы, осуществляющие массированные операции (стриминг)
 ---
-## Элементы технологии
+### Элементы технологии
  - Определение интерфейса (IDL)
  - Кодогенерация
  - Реализация серверного класса
  - Реализация клиентского класса
 ---
-## Определение интерфейса (IDL)
+### Определение интерфейса (IDL)
 
 ```proto [1-25|2|7-10|11-14|15-17|18-20|21-27|23|1-27]
 syntax = "proto3";
@@ -451,7 +451,7 @@ service BillingService{         //Определение интерфейса с
     rpc getCardBalance(GetCardBalanceRequest) returns (GetCardBalanceResponse); }
 ```
 ---
-## Реализация сервера (1)
+### Реализация сервера (1)
 
 ```java [1-24|9|11-16|17-23|19|1-24]
 package grpcex1;
@@ -479,7 +479,7 @@ public class BillingService extends BillingServiceGrpc.BillingServiceImplBase {
     }
 ```
 ---
-## Реализация сервера (2)
+### Реализация сервера (2)
 
 ```java [1-23|1-7|3|8-14|15-22|16|17|18|19|21|1-23]
     public void subMoney(grpc.MoneyRequest request,
@@ -507,7 +507,7 @@ public class BillingService extends BillingServiceGrpc.BillingServiceImplBase {
 }
 ```
 ---
-## Реализация клиента
+### Реализация клиента
 
 ```java [1-23|6|17-22|18|19|20|21|7-8|9|10|11-12|13|14|15]
 package grpcex1;
@@ -535,7 +535,7 @@ public class BillingCllient {
 }
 ```
 ---
-## Компиляция и выполнение
+### Компиляция и выполнение
  - Для сборки проекта используем систему сборки maven и соответствующий плагин кодогенерации (https://github.com/grpc/grpc-java)
      - Запуск сервера:
 ```bash
@@ -546,11 +546,11 @@ mvn exec:java -Dexec.mainClass=grpcex1.BillingService
 mvn exec:java -Dexec.mainClass=grpcex1.BillingCllient
 ```
 ---
-## Пример 2
+### Пример 2
  - Для передачи потока операций от клиента к серверу используем стриминг
  - Используем неблокирующие вызовы (на клиенте)
 ---
-## Определение интерфейса (IDL)
+### Определение интерфейса (IDL)
 
 ```proto [1-25|23]
 syntax = "proto3";
@@ -579,7 +579,7 @@ service BillingService{
     rpc getCardBalance(GetCardBalanceRequest) returns (GetCardBalanceResponse);}
 ```
 ---
-## Прием потока(stream) на сервере
+### Прием потока(stream) на сервере
  - Метод, принимающий поток, определяется следующим образом:
 
 ```java
@@ -589,13 +589,13 @@ public io.grpc.stub.StreamObserver<grpc.ex2.MoneyRequest> processOperation(
  - метод принимает StreamObserver, параметризованный типом возвращаемого сообщения
  - и возвращает StreamObserver, параметризованный типом принимаемого сообщения
 ---
-## Прием потока(stream) на сервере
+### Прием потока(stream) на сервере
  - Возвращаемый методом StreamObserver используется следующим образом:
     - его метод onNext вызывается в момент прихода от клиента очередного сообщения
     - onCompleted вызывается при завершении передачи клиентом потока
     - onError вызывается при возникновении ошибки 
 ---
-## Реализация сервера (1)
+### Реализация сервера (1)
 ```java [1-28|20|1-28]
 package grpcex2;
 import com.google.protobuf.Empty;
@@ -622,7 +622,7 @@ public class BillingService extends BillingServiceGrpc.BillingServiceImplBase {
     }
 ```
 ---
-## Реализация сервера (2)
+### Реализация сервера (2)
 ```java [1-35|1-8|9-33|11-13|15-20|25-32]
 public void getCardBalance(grpc.GetCardBalanceRequest request,
         io.grpc.stub.StreamObserver<grpc.GetCardBalanceResponse> responseObserver){
@@ -649,7 +649,7 @@ public io.grpc.stub.StreamObserver<grpc.MoneyRequest> processOperation(
 }
 ```
 ---
-## Клиент. Асинхронные вызовы
+### Клиент. Асинхронные вызовы
  - Клиентский прокси-объект, позволяющий делать асинхронные вызовы, формируется с помощью специального метода:
 
 ```java 
@@ -662,7 +662,7 @@ public void getCardBalance(grpc.ex2.GetCardBalanceRequest request,
     io.grpc.stub.StreamObserver<grpc.ex2.GetCardBalanceResponse> responseObserver)
 ```
 ---
-## Клиент. Отслеживание результата вызова 
+### Клиент. Отслеживание результата вызова 
 
 ```java [1-23|5|6|7|8-10|11-14|20-22|1-23]
 package grpcex2;
@@ -690,7 +690,7 @@ public class WaitObserver<T> implements StreamObserver<T> {
 }
 ```
 ---
-## Клиент. Передача потока(stream) на сервер
+### Клиент. Передача потока(stream) на сервер
  - Метод, принимающий поток имеет следующую сигнатуру:
 
 ```java 
@@ -701,7 +701,7 @@ public io.grpc.stub.StreamObserver<grpc.ex2.MoneyRequest> processOperation(
  - Клиент формирует сообщения и отправляет их в поток, вызывая метод onNext
  - Когда формирование потока закончено, клиент вызывает onCompleted
 ---
-## Реализация клиента (1)
+### Реализация клиента (1)
 
 ```java [1-31|13|14|8-11|10|16|17|18-22|19-20|21|23]
 package grpcex2;
@@ -729,7 +729,7 @@ public class BillingClient {
         addCardsLatch.await(1, TimeUnit.MINUTES); //ожидание завершения ВСЕХ вызовов
 ```
 ---
-## Реализация клиента (2)
+### Реализация клиента (2)
 
 ```java [1-23|1|2|3|4-10|6-8|9|11|12|13|14-15|16-20|19|21|1-23]
         final CountDownLatch operationLatch = new CountDownLatch(1);
@@ -757,13 +757,13 @@ public class BillingClient {
 }
 ```
 ---
-## Запуск
+### Запуск
 Почему даже при первом вызове addNewCard выводятся все карты? <!-- .element: class="left" -->
 ![grpcServer](../img/grpcServer.png) 
 ![grpcClient](../img/grpcClient.png) <!-- .element: class="small_image" -->
 
 ---
-## Итоги
+### Итоги
  - gRPC позволяет быстро строить распределенные приложения
  - Имеется возможность использовать неблокирующие вызовы и стриминг (в том числе двунаправленный)
  - Имеются удобные инструментальные средства поддержки  Java (и других языков тоже)

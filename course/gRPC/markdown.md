@@ -10,6 +10,8 @@
 ---
 ### gRPC - система удаленного вызова процедур
 ![https://grpc.io/img/landing-2.svg](https://grpc.io/img/landing-2.svg)
+
+fhttps://grpc.io/img/landing-2.svg<!-- .element: class="copyright-reference"  -->
  - Задача –предоставить быстрый и надежный, не зависящий от языка программирования  механизм RPC
 
 ---
@@ -177,7 +179,7 @@ public interface StreamObserver<V> {
 ---
 ## Hello. Сервер
 
-```java [5|15|16|17|18|19|20|7-8|9-10|11|12]
+```java [1-22|5|15|16|17|18|19|20|7-8|9-10|11|12]
 package hello;
 import io.grpc.*;
 import grpc.*;
@@ -204,7 +206,7 @@ public class EchoServer extends EchoServiceGrpc.EchoServiceImplBase {
 ---
 ## Hello. Клиент
 
-```java [7-8|19-20|21|22|23|24|13-14|15|16]
+```java [1-23|7|18-20|21|11-12|13|14]
 package hello;
 import grpc.*;
 import io.grpc.*;
@@ -307,13 +309,12 @@ message Foo {                   //Резервирование полей для
 ```
 ---
 ## Protocol Buffers IDL (перечислимый тип)
-
-```proto
-message SearchRequest {     //Имя типа 
+```proto 
+message SearchRequest {         //Имя типа 
     string query = 1;
     int32 page_number = 2;
     int32 result_per_page = 3;
-    enum Corpus {             //Допустимые значения 
+    enum Corpus {               //Допустимые значения 
         UNIVERSAL = 0;          //(значение по умолчанию - нулевое)
         WEB = 1;
         IMAGES = 2;
@@ -367,7 +368,6 @@ CHECK(!message.has_name());
 ```
 ---
 ## Protocol Buffers IDL (хэш-таблицы)
-
 ```proto
 message Project {
     int32 page_number = 2;
@@ -423,7 +423,7 @@ service SearchService {
 ---
 ## Определение интерфейса (IDL)
 
-```proto [2|7-10|11-14|15-17|18-20|21-27|23|1-27]
+```proto [1-25|2|7-10|11-14|15-17|18-20|21-27|23|1-27]
 syntax = "proto3";
 import "google/protobuf/empty.proto"; //импорт других proto-файлов
 package grpc;
@@ -453,7 +453,7 @@ service BillingService{         //Определение интерфейса с
 ---
 ## Реализация сервера (1)
 
-```java [1-24|9|11-17|18-24|20]
+```java [1-24|9|11-16|17-23|19|1-24]
 package grpcex1;
 import com.google.protobuf.Empty;
 import grpc.*;
@@ -481,7 +481,7 @@ public class BillingService extends BillingServiceGrpc.BillingServiceImplBase {
 ---
 ## Реализация сервера (2)
 
-```java [1-24|1-7|3|8-15|16-23|17|18|19|20|22]
+```java [1-23|1-7|3|8-14|15-22|16|17|18|19|21|1-23]
     public void subMoney(grpc.MoneyRequest request,
                          io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
         cards.computeIfPresent(request.getCard(),(key,value)->value - request.getMoney());
@@ -596,7 +596,7 @@ public io.grpc.stub.StreamObserver<grpc.ex2.MoneyRequest> processOperation(
     - onError вызывается при возникновении ошибки 
 ---
 ## Реализация сервера (1)
-```java [1-28]
+```java [1-28|20|1-28]
 package grpcex2;
 import com.google.protobuf.Empty;
 import grpc.*;
@@ -623,7 +623,7 @@ public class BillingService extends BillingServiceGrpc.BillingServiceImplBase {
 ```
 ---
 ## Реализация сервера (2)
-```java [1-35|1-8|9-33|11|15-19|25-32]
+```java [1-35|1-8|9-33|11-13|15-20|25-32]
 public void getCardBalance(grpc.GetCardBalanceRequest request,
         io.grpc.stub.StreamObserver<grpc.GetCardBalanceResponse> responseObserver){
         GetCardBalanceResponse response = GetCardBalanceResponse.newBuilder()
@@ -664,7 +664,7 @@ public void getCardBalance(grpc.ex2.GetCardBalanceRequest request,
 ---
 ## Клиент. Отслеживание результата вызова 
 
-```java [1-25]
+```java [1-23|5|6|7|8-10|11-14|20-22|1-23]
 package grpcex2;
 import io.grpc.stub.StreamObserver;
 import java.util.concurrent.CountDownLatch;
@@ -703,7 +703,7 @@ public io.grpc.stub.StreamObserver<grpc.ex2.MoneyRequest> processOperation(
 ---
 ## Реализация клиента (1)
 
-```java [1-31|16|17-18|8-14|13|20-21|22|23-29|28|30-31]
+```java [1-31|13|14|8-11|10|16|17|18-22|19-20|21|23]
 package grpcex2;
 import com.google.protobuf.Empty;
 import grpc.*;
@@ -731,7 +731,7 @@ public class BillingClient {
 ---
 ## Реализация клиента (2)
 
-```java [1-25|1|2|3|4-10|6-8|9|11|12|14|15|16|17-22|21|23]
+```java [1-23|1|2|3|4-10|6-8|9|11|12|13|14-15|16-20|19|21|1-23]
         final CountDownLatch operationLatch = new CountDownLatch(1);
         observer = new WaitObserver<>(operationLatch, t->{});
         StreamObserver<MoneyRequest> requestObserver = asyncClient.processOperation(observer);

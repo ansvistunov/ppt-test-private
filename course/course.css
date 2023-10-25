@@ -71,5 +71,11 @@
 .small_font{
   font-size: 60%;
 }
+.fragment.gray {
+  filter: blur(2px);
+}
+.fragment.gray.visible {
+  filter: none;
+}
 
   

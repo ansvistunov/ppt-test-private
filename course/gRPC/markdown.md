@@ -11,7 +11,7 @@
 ### gRPC - система удаленного вызова процедур
 ![https://grpc.io/img/landing-2.svg](https://grpc.io/img/landing-2.svg)
 
-fhttps://grpc.io/img/landing-2.svg<!-- .element: class="copyright-reference"  -->
+https://grpc.io/img/landing-2.svg<!-- .element: class="copyright-reference"  -->
  - Задача –предоставить быстрый и надежный, не зависящий от языка программирования  механизм RPC
 
 ---

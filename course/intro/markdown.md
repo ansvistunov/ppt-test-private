@@ -358,6 +358,23 @@ https://assets.digitalocean.com/articles/understanding_sharding/DB_image_2_cropp
 
 https://assets.digitalocean.com/articles/understanding_sharding/DB_image_3_cropped.png<!-- .element: class="copyright-reference" -->
 ---
+### Репликация
+При работе с данными в распределенных системах часто возникает задача обеспечения отказоустойчивости, т.е. сохранения данных, при отказе одного или нескольких узлов системы. Одним из способов обеспечения отказоустойчивости является репликация данных.
+При использовании master-slave репликации один из узлов (master) рассылает изменения данных на другие узлы (slave). При этом изменения данных допускаются только на master-узле, все остальные узлы могут только читать данные, но не изменять их.
+<br>Количество узлов, на которые присходит репликация часто называют replication factor для системы. Это то количество узлов, которое может быть потеряно, без потери данных
+<br>Использование репликации может помочь распределить нагрузку по узлам системы, поскольку операции чтения можно выполнять на репликах <!-- .element: class="left small_font" -->
+
+![Replication-1](https://mariadb.com/sites/default/files/pictures/Images/dbreplication173.png)<!-- .element: width="40%" --> 
+
+https://mariadb.com/sites/default/files/pictures/Images/dbreplication173.png<!-- .element: class="copyright-reference" -->
+---
+### Репликация & шардинг
+Часто репликация и шардинг используется совместно. При этом узел может хранить один мастер-шард, в который вносятся изменения и нексолько копий шардов других узлов, которые используются для обеспечения сохранения данных в случае отказа. При таком подходе нагрузка по изменению данных также может быть распределена между узлами<!-- .element: class="left small_font" -->
+
+![Replication-2](https://cdn.educba.com/academy/wp-content/uploads/2020/04/Kafka-Cluster-with-replication-factor-2.png.webp)<!-- .element: width="50%" --> 
+
+https://cdn.educba.com/academy/wp-content/uploads/2020/04/Kafka-Cluster-with-replication-factor-2.png.webp<!-- .element: class="copyright-reference" -->
+---
 ### Транзакции 2pc
 
 ---

@@ -397,9 +397,54 @@ https://cdn.educba.com/academy/wp-content/uploads/2020/04/Kafka-Cluster-with-rep
 
 <br>После завершения второй фазы, когда был получен положительный ответ от всех участников, диспетчер сообщает клиенту об успешном завершении транзакции
 ---
+
 ### Транзакции SAGA
+Шаблон SAGA (Saga) предназначен для управления распределенными транзакциями, при которых отдельные действия могут выполняться в разных сервисах или компонентах системы. В отличие от традиционных транзакций, которые используют блокировки и откаты на уровне базы данных, SAGA разбивает транзакцию на серию небольших шагов, каждый из которых является автономной транзакцией<!-- .element: class="left" -->
+
+![SAGA](https://learn.microsoft.com/ru-ru/azure/architecture/reference-architectures/saga/images/saga-overview.png)<!-- .element: width="50%" --> 
+
+https://learn.microsoft.com/ru-ru/azure/architecture/reference-architectures/saga/images/saga-overview.png<!-- .element: class="copyright-reference" -->
+---
+### Основные концепции SAGA
+- Шаги транзакции (Transaction Steps):
+     - Каждая SAGA состоит из последовательности шагов, каждый из которых выполняется как отдельная локальная транзакция.
+     - Если шаг завершается успешно, система переходит к следующему шагу.
+- Компенсационные действия (Compensating Actions):
+     - Для каждого шага определяется компенсирующее действие, которое откатывает изменения в случае ошибки.
+     - Компенсационные действия выполняются в обратном порядке к выполненным шагам, чтобы "отменить" уже сделанные изменения.
 
 ---
+### Основные концепции SAGA
+- Координация (Coordination):
+    - Координация шагов может быть централизованной (с использованием оркестратора) или децентрализованной (с использованием хореографии).
+
+---
+### Оркестрация (Orchestration):
+- Центральный координатор (оркестратор) управляет выполнением всех шагов SAGA.
+- Оркестратор отслеживает статус каждого шага и при необходимости инициирует выполнение компенсационных действий.
+
+![SAGA-Orchestration](https://learn.microsoft.com/ru-ru/azure/architecture/reference-architectures/saga/images/orchestrator.png)<!-- .element: width="50%" --> 
+
+https://learn.microsoft.com/ru-ru/azure/architecture/reference-architectures/saga/images/orchestrator.png<!-- .element: class="copyright-reference" -->
+---
+### Хореография (Choreography):
+- Каждый сервис самостоятельно инициирует выполнение следующего шага, основываясь на событиях.
+- Компенсационные действия также инициируются по событиям, без централизованного управления.
+
+![SAGA-Choreography](https://learn.microsoft.com/ru-ru/azure/architecture/reference-architectures/saga/images/choreography-pattern.png)<!-- .element: width="50%" --> 
+
+https://learn.microsoft.com/ru-ru/azure/architecture/reference-architectures/saga/images/choreography-pattern.png<!-- .element: class="copyright-reference" -->
+
+---
+### Преимущества и недостатки SAGA
+- (+)
+    - гибкость и масштабируемость: Позволяет управлять транзакциями без блокировок на уровне базы данных.
+    - Локальные транзакции: Каждая часть транзакции выполняется как автономная транзакция, что упрощает управление.
+    - Компенсационные действия: Возможность отката изменений, выполненных до момента ошибки.
+- (-)
+    - Сложность реализации: Реализация логики компенсации может быть сложной.
+    - Потенциальные временные несогласованности: Возможны временные состояния, когда часть системы уже обновлена, а часть еще нет.
+
 ### Command and Query Responsibility Segregation (CQRS)
 ---
 ### Service Discovery (на стороне клиента)
@@ -410,4 +455,3 @@ https://cdn.educba.com/academy/wp-content/uploads/2020/04/Kafka-Cluster-with-rep
 ### Circuit Breaker
 
 ---
-### Command Query Responsibility Segregation, CQRS

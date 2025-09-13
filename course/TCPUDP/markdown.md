@@ -144,6 +144,17 @@
     - Прием сообщений блокирующий
 ---
 ## Прикладные протоколы
+- Типы сообщений (пример)
+- С –клиент, S –сервер
+
+| Код | Тип | Отправитель | Получатель | Комментарий |
+| :-- | :--: | ---------: | ---------: | ----------: |
+|1  |(REQ)	|request    		|C             |S             	|Запрос клиента на получение данных|
+|2  |(REP)  	|reply                  |S             |C             	|Ответ сервера на запрос клиента   |
+|3  |(ACK)  	|ack                    |S/C           |C/S          	|Предыдущее сообщение доставлено   |
+|4  |(AYA)  	|are you alive?       	|C             |S              	|Тестовое сообщение для проверки работоспособности сервера |
+|5  |(IAA)   	|I am alive             |S             |C             	|Ответ сервера о его работоспособности |
+|6  |(TA)    	|try again              |S             |C             	|Сервер перегружен и не имеет ресурсов для обработки запроса |
 
 ---
 ## Прикладные протоколы
@@ -326,6 +337,47 @@ class ClientConnection extends Thread {
  }
 }
 ```
+---
+## Немного доработаем сервер
+```java
+package net.tcp;
+
+import java.io.*;
+import java.net.*;
+import java.util.concurrent.*;
+
+public class SmartTCPServer {
+    public static final int N_THREADS = 10;
+    public static final int PORT  = 8080;
+    private static final Executor executor = Executors.newFixedThreadPool(N_THREADS);
+    private static final BlockingQueue<Socket> connectionQueue= new LinkedBlockingQueue<>();
+
+    public static void main(String[] args) throws IOException {
+        ServerSocket serverSocket = new ServerSocket(PORT);
+        for (int i = 0; i < N_THREADS; i++ ){
+            executor.execute(SmartTCPServer::run);
+        }
+        while (true) connectionQueue.add(serverSocket.accept());
+    }
+
+    private static void run() {
+        while (true) {
+            try {
+                Socket socket = connectionQueue.take();
+                System.out.println("Thread "+ Thread.currentThread() + " work with connection "+socket);
+                var in = new DataInputStream(socket.getInputStream());
+                var out = new DataOutputStream(socket.getOutputStream());
+                String data = in.readUTF(); // read a line of data from the stream
+                out.writeUTF(data); // write a line to the stream
+                socket.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+```
+
 ---
 ## Полезные классы. URL (java.net)
 - Класс java.net.URL представляет собой идентификатор ресурса – Uniform Resource Locator
@@ -639,7 +691,7 @@ public class Card implements Serializable{
 }
 ```
 ---
-## Класс Card
+## Класс CardOperation
 ```java
 package com.asw.net.ex2;
 import java.util.*;

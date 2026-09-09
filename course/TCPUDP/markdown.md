@@ -634,6 +634,198 @@ public class UDPServer {
     - Конструктор для создания сокета и соединения с удаленным узлом и портом 
     - Методы для работы с входными и выходными потоками
 
+
+---
+### Рассылка сообщений в UDP (Multicast)
+<div style="flex: 1; text-align: center; font-size: 80%;">
+
+- До сих пор мы рассматривали Unicast (точечную доставку): один отправитель → один получатель.
+- Специфика UDP позволяет эффективно реализовать одновременную рассылку пакетов группе узлов.
+- Виды рассылок:
+    - Broadcast (Широковещание): пакет доставляется всем узлам в локальной сети (например, адрес 255.255.255.255). Запрещен в интернет-маршрутизации.
+    - Multicast (Мультикаст): пакет доставляется группе узлов, которые подписались на определенный адрес (например, диапазон 224.0.0.0 — 239.255.255.255).
+- Почему это возможно только в UDP?
+    - TCP требует установки соединения и подтверждения доставки. Рассылка соединений множеству адресов не имеет смысла и неэффективна.
+    - UDP работает по принципу «отправил и забыл» (fire-and-forget), что идеально для пакетов-анонсов.
+</div>
+
+---
+### Java API для Multicast (java.net)
+<div style="flex: 1; text-align: center; font-size: 80%;">
+
+- Для приема multicast-пакетов используется класс MulticastSocket (наследник DatagramSocket).
+- Жизненный цикл получателя:
+    - Создание MulticastSocket на определенном порту.
+    - Присоединение к группе рассылки: socket.joinGroup(InetAddress group).
+    - Прием пакетов стандартным методом receive(DatagramPacket p).
+    - Выход из группы: socket.leaveGroup(InetAddress group).
+- Отправитель:
+    - Использует обычный DatagramSocket.
+    - В качестве адреса получателя в DatagramPacket указывает multicast-адрес группы.
+- Особенности:
+    - Сообщение получат все участники группы в сети.
+    - Отправитель также может получить собственное сообщение (если он в той же группе).
+</div>
+
+---
+### Пример: Паттерн Service Discovery
+<div style="flex: 1; text-align: center; font-size: 80%;">
+
+- Проблема: В распределенной системе (микросервисы) новые экземпляры сервисов могут динамически запускаться и останавливаться. Как клиентам узнать, по каким адресам они работают?
+- Решение: Паттерн Service Discovery (саморегистрация).
+    - Запускается Центр обнаружения (Discovery Service) и слушает multicast-порт.
+    - Новый сервис (Discovery Client) при старте начинает периодически слать UDP-пакет со своим адресом в multicast-группу: "Я сервис X, работаю на порту Y".
+    - Центр обнаружения принимает пакет, запоминает сервис в своем реестре и отправляет обратно unicast-ответ (ACK).
+    - Получив ACK, сервис прекращает рассылку (или продолжает слать "heartbeat" для контроля живучести).
+- Любой желающий может запросить у Центра обнаружения список активных сервисов (например, по HTTP).
+</div>
+
+---
+### Service Discovery: Центр обнаружения (код)
+```java
+public class DiscoveryService implements Runnable{
+    final MulticastSocket socket;
+    public static final int udpPort = 7070;
+    final InetAddress group;
+    final Set<String> services; // Реестр найденных сервисов
+
+    public DiscoveryService() throws IOException {
+        socket = new MulticastSocket(udpPort);
+        group = InetAddress.getByName("230.0.0.0");
+        socket.joinGroup(group); // Подписываемся на multicast-группу
+        services = new HashSet<>();
+        // ... запуск HTTP сервера для выдачи реестра ...
+    }
+
+    @SneakyThrows
+    @Override
+    public void run() {
+        byte[] buf = new byte[256];
+        while (true) {
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            socket.receive(packet); // Ждем анонс от клиента
+            String received = new String(packet.getData(), 0, packet.getLength());
+            services.add(received); // Добавляем в реестр
+            // Отправляем подтверждение (ACK) обратно клиенту (unicast)
+            DatagramPacket answer = new DatagramPacket(
+                "DiscoveryService".getBytes(), 16, packet.getAddress(), packet.getPort());
+            socket.send(answer);
+        }
+    }
+}
+```
+
+---
+### Service Discovery: Клиент (код)
+```java
+public class DiscoveryClient{
+    final InetAddress group;
+    final DatagramSocket socket; // Обычный сокет для отправки
+    final String serviceName;
+
+    public DiscoveryClient(int servicePort, String name) throws Exception {
+        group = InetAddress.getByName("230.0.0.0");
+        socket = new DatagramSocket();
+        // Формируем уникальный идентификатор: Имя:Хост:Порт
+        serviceName = name + ":" + InetAddress.getLocalHost().getHostName() + ":" + servicePort;
+
+        // Таймер: каждые 1000 мс отправляем анонс (heartbeat)
+        new Timer().schedule(new TimerTask() {
+            public void run() {
+                byte[] buf = serviceName.getBytes();
+                socket.send(new DatagramPacket(buf, buf.length, group, 7070));
+            }
+        }, 100, 1000);
+
+        // Таймер: ждем ответа (ACK) от Центра обнаружения
+        new Timer().schedule(new TimerTask() {
+            @SneakyThrows
+            public void run() {
+                DatagramPacket packet = new DatagramPacket(new byte[512], 512);
+                socket.receive(packet); // Блокирующий прием
+                String received = new String(packet.getData(), 0, packet.getLength());
+                if (received.startsWith("DiscoveryService")) {
+                    System.out.println("Успешно зарегистрированы!");
+                    this.cancel(); // Останавливаем таймеры
+                }
+            }
+        }, 100, 1000);
+    }
+}
+```
+---
+### Иллюстрация работы Service Discovery
+
+<div style="display: flex; gap: 20px; align-items: flex-start;">
+
+<!-- Левая колонка: Описание -->
+<div style="flex: 1; text-align: center; font-size: 60%;">
+
+Жизненный цикл:
+
+- Discovery Service запускается и вступает в группу 230.0.0.0.
+- Запускается Клиент (например, UserService).
+- Клиент шлет multicast-пакет: "UserService:192.168.1.10:1520".
+- Сервис принимает пакет, сохраняет его в Set<String>.
+- Сервис отправляет unicast-ответ: "DiscoveryService".
+- Клиент получает ответ, понимает, что его заметили, и замолкает.
+- Потребитель делает HTTP-запрос GET /services к Центру и получает список доступных узлов.
+
+Плюсы подхода:
+- Не нужно жестко прописывать IP-адреса.
+- Динамическое масштабирование.
+
+</div>
+
+<!-- Правая колонка: SVG диаграмма -->
+<div style="flex: 1; text-align: center;">
+
+<svg width="100%" height="auto" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg" style="max-width: 600px; font-family: sans-serif;">
+<!-- Заголовки участников -->
+<rect x="50" y="20" width="120" height="30" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+<text x="110" y="40" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Client</text>
+<rect x="240" y="20" width="120" height="30" rx="5" fill="#f3f4f6" stroke="#6b7280" stroke-width="2"/>
+<text x="300" y="40" text-anchor="middle" font-size="14" font-weight="bold" fill="#374151">Multicast Group</text>
+<rect x="430" y="20" width="120" height="30" rx="5" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+<text x="490" y="40" text-anchor="middle" font-size="14" font-weight="bold" fill="#166534">Discovery Service</text>
+<!-- Линии времени -->
+<line x1="110" y1="50" x2="110" y2="350" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5,5"/>
+<line x1="490" y1="50" x2="490" y2="350" stroke="#22c55e" stroke-width="2" stroke-dasharray="5,5"/>
+<!-- 1. Multicast Send -->
+<line x1="110" y1="100" x2="480" y2="100" stroke="#6b7280" stroke-width="2" stroke-dasharray="4,4"/>
+<polygon points="480,100 470,95 470,105" fill="#6b7280"/>
+<text x="295" y="90" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">1. send (Multicast)</text>
+<text x="295" y="115" text-anchor="middle" font-size="11" fill="#6b7280">"UserService:host:port"</text>
+<!-- 2. Multicast Receive -->
+<rect x="475" y="130" width="30" height="40" fill="#bbf7d0" stroke="#22c55e" stroke-width="1"/>
+<text x="490" y="155" text-anchor="middle" font-size="11" fill="#166534">recv</text>
+<!-- 3. Unicast ACK -->
+<line x1="490" y1="200" x2="120" y2="200" stroke="#6b7280" stroke-width="2"/>
+<polygon points="120,200 130,195 130,205" fill="#6b7280"/>
+<text x="305" y="190" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">2. send (Unicast ACK)</text>
+<text x="305" y="215" text-anchor="middle" font-size="11" fill="#6b7280">"DiscoveryService"</text>
+<!-- 4. Client Receive ACK -->
+<rect x="95" y="230" width="30" height="40" fill="#bfdbfe" stroke="#3b82f6" stroke-width="1"/>
+<text x="110" y="255" text-anchor="middle" font-size="11" fill="#1e3a8a">recv</text>
+<!-- 5. HTTP Request (опционально) -->
+<text x="295" y="310" text-anchor="middle" font-size="12" fill="#9ca3af" font-style="italic">Позже: Потребитель делает HTTP GET /services</text>
+<line x1="110" y1="330" x2="480" y2="330" stroke="#9ca3af" stroke-width="2" stroke-dasharray="2,2"/>
+<polygon points="480,330 470,325 470,335" fill="#9ca3af"/>
+<text x="295" y="350" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">3. HTTP GET /services</text>
+</svg>
+
+</div>
+</div>
+
+---
+### Предварительные итоги по UDP
+
+- Пакет java.net позволяет реализовывать как точечные (Unicast), так и групповые (Multicast) взаимодействия.
+- Multicast идеально подходит для обнаружения сервисов (Service Discovery) и heartbeats.
+- Отсутствие гарантии доставки в UDP требует применения прикладных протоколов (например, таймеров повторной отправки, как в DiscoveryClient).
+
+
+
 ---
 ### Java API для TCP
 

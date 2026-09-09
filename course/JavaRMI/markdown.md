@@ -4,17 +4,20 @@
 - Java RMI – одна  из реализаций промежуточного программного обеспечения 
 - Входит в состав jdk => не требует инсталляции, настройки, …
 ---
-## Java RMI
+### Java RMI
 - Встроенная реализация механизма вызова удаленных методов
 - Пакеты java.rmi.*
 - Предназначен для реализации распределенных приложений с использованием ТОЛЬКО Java
-=> экстремально прост в использовании для Java-приложений
+    - => экстремально прост в использовании для Java-приложений
 ---
-## Элементы технологии
+### Элементы технологии
 - Прокси (клиентская заглушка), скелетон и диспетчер генерируются автоматически
 - Реализация методов серверных объектов выполняется программистом
+
+![RMIArch](../img/RMIArch.png)
+
 ---
-## Принцип работы
+### Принцип работы
 - Сервер публикует объект-обработчик удаленных вызовов
 - Клиент производит поиск серверного объекта по его имени и получает proxy-объект, связанный с опубликованным сервером обработчиком
 - Клиент вызывает методы proxy-объекта, RMI передает запрос на удаленную JVM и направляет его в реализацию объекта
@@ -22,33 +25,36 @@
 - Любые возвращаемые из реализации серверного обработчика значения передаются назад в proxy-объект и затем на клиент
 - Для кодирования\декодирования передаваемых данных используется сериализация
 ---
-## Элементы технологии
+### Элементы технологии
 - Основан на взаимодействии между узлами с использованием сетевого протокола TCP/IP 
 - Обеспечивает основные возможности соединения и некоторые стратегии защиты от несанкционированного доступа
 - Основной принцип - разделение интерфейса (контракта) и реализации этого интерфейса (поведения)
 ---
-## Процедура поиска
+### Процедура поиска
 - Клиенты находят удаленные объекты, используя службу имен или каталогов 
 - RMI может использовать различные службы, включая Java Naming and Directory Interface (JNDI) 
 - RMI включает в себя простую службу – реестр RMI (rmiregistry). Эта утилита доступна в составе JRE. Единственный параметр консольной утилиты – рабочий порт
 - RMI Registry работает на каждой машине, содержащей объекты удаленных служб и принимающей запросы на обслуживание (по умолчанию используется порт 1099) 
 ---
-## Передача параметров. Примитивные типы
+### Передача параметров. Примитивные типы
 - Передача в удаленный метод параметров примитивных типов происходит по значению - RMI делает копию значения простого типа и передает ее в удаленный метод 
 - Если метод возвращает значение простого типа, также используется передача по значению
 - Значения передаются между JVM в стандартном, машинно-независимом формате; это позволяет JVM, работающим на разных платформах, надежно взаимодействовать друг с другом
 ---
-## Передача параметров. Объекты
+### Передача параметров. Объекты
 - Передача в удаленный метод параметров типа «объект» также происходит по значению - RMI делает копию объекта и передает ее в удаленный метод 
 - Для создания копии используется механизм сериализации - состояние объекта преобразуется в набор байтов, пересылаемых по сети
 - Это означает, что все классы, объекты которых должны передаваться в удаленные методы (или возвращаться из них) должны быть сериализуемыми (реализовывать интерфейс Serializable и содержать только Serializable поля, или поля, объявленные как transient)
 ---
-## Передача параметров. Ссылки на удаленные объекты
+### Передача параметров. Ссылки на удаленные объекты
 - При передаче в качестве параметра или возвращаемого значения ссылки на удаленный прокси-объект сериализация не используется - вместо этого передается удаленная ссылка
 - Получатель получает для работы локальную ссылку на прокси-объект удаленного объекта
 - С точки зрения кода передача удаленной ссылки абсолютно прозрачна: если объект доступен удаленно, значит он был передан по значению и для него были выполнены условия передачи экземпляра объектного типа
 ---
-## Динамическая загрузка классов
+### Динамическая загрузка классов
+
+<div style="flex: 1; text-align: center; font-size: 80%;">
+
 - Любой класс, передаваемый на клиент прямо или косвенно (через зависимость) должен быть доступен клиенту, речь идет именно о байт-коде
 - Есть два способа обеспечить это
     - Поместить в Classpath клиента все необходимые классы
@@ -59,13 +65,62 @@
 - В JDK есть менеджер, который решить эту проблему:
     - System.setSecurityManager(new SecurityManager()); 
 - Также можно написать собственную реализацию SecurityManager с необходимым поведением
+
+</div>
+
 ---
-## Динамическая загрузка классов
+### Динамическая загрузка классов
 - Для подключения динамической загрузки классов можно установить соответствующее JVM property
 - -Djava.rmi.server.codebase=http://host:8080/rmi/ 
 
+<svg width="80%" height="auto"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 550" font-family="Segoe UI, Arial, sans-serif" font-size="14px">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+    </marker>
+    <style>
+      .box { fill: #f8f9fa; stroke: #495057; stroke-width: 2; }
+      .text { fill: #333; font-weight: bold; }
+      .msg-line { stroke: #333; stroke-width: 2; fill: none; }
+      .note { fill: #fff3cd; stroke: #ffe69c; stroke-width: 1; }
+      .note-text { fill: #664d03; }
+      .step-text { fill: #333; font-size: 13px; }
+      .dashed { stroke: #adb5bd; stroke-dasharray: 6 4; stroke-width: 1.5; fill: none; }
+    </style>
+  </defs>
+  <!-- Узлы -->
+  <!-- RMI Client -->
+  <rect x="100" y="50" width="200" height="70" rx="5" class="box"/>
+  <text x="200" y="90" text-anchor="middle" class="text">RMI client</text>
+  <!-- Remote object instance -->
+  <rect x="500" y="50" width="250" height="70" rx="5" class="box"/>
+  <text x="625" y="90" text-anchor="middle" class="text">Remote object instance</text>
+  <!-- URL location -->
+  <rect x="500" y="300" width="250" height="70" rx="5" class="box"/>
+  <text x="625" y="340" text-anchor="middle" class="text">URL location</text>
+  <!-- Шаг 6: Вызов удаленного метода -->
+  <line x1="300" y1="85" x2="495" y2="85" class="msg-line" marker-end="url(#arrow)"/>
+  <text x="397" y="75" text-anchor="middle" class="step-text">6. Вызов удаленного метода</text>
+  <text x="397" y="105" text-anchor="middle" class="step-text" font-size="12px">(передача неизвестного подтипа)</text>
+  <!-- Шаг 7: Загрузка определения класса -->
+  <line x1="625" y1="120" x2="625" y2="295" class="msg-line" marker-end="url(#arrow)"/>
+  <text x="720" y="200" text-anchor="middle" class="step-text">7. Запрос и загрузка</text>
+  <text x="720" y="218" text-anchor="middle" class="step-text">определения класса</text>
+  <text x="720" y="236" text-anchor="middle" class="step-text">подтипа</text>
+  <!-- Заметка с codebase слева -->
+  <path d="M 50 300 L 350 300 L 350 370 L 50 370 Z" class="note"/>
+  <text x="200" y="325" text-anchor="middle" class="note-text">Свойство клиента:</text>
+  <text x="200" y="350" text-anchor="middle" class="note-text" font-family="monospace" font-size="12px">java.rmi.server.codebase=</text>
+  <text x="200" y="365" text-anchor="middle" class="note-text" font-family="monospace" font-size="12px">http://wwwServer/mydirectory/</text>
+  <!-- Пунктирная связь от заметки к клиенту (указывает, что свойство belongs to client) -->
+  <path d="M 200 300 L 200 120" class="dashed"/>
+</svg>
+
+
+
+
 ---
-## Security
+### Security
 - Security manager разрешает Classloader’у загружать классы с удаленной машины по предоставленному codebase
 - Тем не менее, скачанным proxy-классам  в большинстве случаев необходимо разрешение на установку socket-соединения и прослушивание портов
 - Есть два основных способа обеспечить это требование
@@ -80,14 +135,14 @@ grant
  и применить его: -Djava.security.policy=security.policy
 - Создать собственную реализацию Security Manager
 ---
-## Используемые классы
+### Используемые классы
 - Интерфейс java.rmi.Remote – методов не содержит (тэгирующий интерфейс)
     - Служит для указания системе классов, являющихся серверными
 - Класс java.rmi.server.UnicastRemoteObject –  используется для экспорта серверных классов и получения клиентских заглушек
 - Интерфейс java.rmi.registry.Registry – реализации этого интерфейса содержат методы получения/помещения удаленных объектных ссылок по имени
 - Класс java.rmi.registry.LocateRegistry – используется для получения ссылки на Registry
 ---
-## Определение интерфейса
+### Определение интерфейса
 ```java
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -101,7 +156,13 @@ public interface Hello extends Remote {
 - Интерфейс должен быть унаследован от java.rmi.Remote
 - Методы бросают исключения RemoteException
 ---
-## Реализация серверного класса
+### Реализация серверного класса
+
+<div style="display: flex; gap: 20px; align-items: flex-start;">
+
+<!-- Левая колонка: Код -->
+<div style="flex: 1; text-align: left;">
+
 ```java
 public class RMIServer implements Hello {
   public String sayHello() {
@@ -123,16 +184,32 @@ public class RMIServer implements Hello {
   }
 }
 ```
-Импорт элементов пакета java.rmi
-Серверный класс реализует интерфейс (Hello)
-Реализуется метод, определенный в удаленном интерфейсе
+
+</div>
+
+<div style="flex: 1; text-align: left; font-size: 50%;">
+
+Импорт элементов пакета java.rmi <br>
+Серверный класс реализует интерфейс (Hello)<br>
+Реализуется метод, определенный в удаленном интерфейсе <br>
 В методе main
-Создается экземпляр класса
-Вызывается статический метод exportObject класса UnicastRemoteObject – объект экспортируется и становится способным принимать удаленные вызовы
-Полученный интерфейс помещается в сервис имен под именем Hello
+- Создается экземпляр класса
+- Вызывается статический метод exportObject класса UnicastRemoteObject – объект экспортируется и становится способным принимать удаленные вызовы
+- Полученный интерфейс помещается в сервис имен под именем Hello
+
 Другой способ состоит в наследовании серверного класса от класса UnicastRemoteObject (отпадает необходимость вызова exportObject)
+
+</div>
+</div>
+
 ---
-## Реализация клиента 
+### Реализация клиента 
+
+<div style="display: flex; gap: 20px; align-items: flex-start;">
+
+<!-- Левая колонка: Код -->
+<div style="flex: 1; text-align: left;">
+
 ```java
 public class RMIClient {
   public static void main(String[] args) {
@@ -151,35 +228,55 @@ public class RMIClient {
   }
 }
 ```
-Импорт элементов пакета java.rmi (не показано)
+
+</div>
+
+<div style="flex: 1; text-align: left; font-size: 70%;">
+
+Импорт элементов пакета java.rmi (не показано) <br>
 В методе main:
-С помощью сервиса имен ищется удаленный объект по имени
-Получается объектная ссылка
-Осуществляется вызов удаленного метода
+  - С помощью сервиса имен ищется удаленный объект по имени
+  - Получается объектная ссылка
+  - Осуществляется вызов удаленного метода
+
+</div>
+</div>
 
 ---
-## Автоматическая генерация вспомогательных компонентов  
+### Автоматическая генерация вспомогательных компонентов  
+
+![RMIAuto](../img/RMIAutogenerate.png)
 
 ---
-## Автоматическая генерация вспомогательных компонентов
+### Автоматическая генерация вспомогательных компонентов
 - Определение интерфейса удаленного объекта
 - Реализация серверного класса (методов удаленного интерфейса)
 - Генерация вспомогательных компонентов (rmic –v1.2 –keep ServerClassImpl)
     - В актуальных версиях jdk генерация прокси-классов выполняется автоматически в момент выполнения программы (без явного использования утилиты rmic)
 
 ---
-## Вызов удаленных методов в java RMI
+### Вызов удаленных методов в java RMI
+
+![RMICall](../img/RMICall.png)
 
 ---
-## Выполнение примера
+### Выполнение примера
 - rmiregistry
 - Java Server
 - Java Client
 ---
-## Выполнение примера
+##№ Выполнение примера
+
+![RMIExec1](../img/RMIExec1.png)
 
 ---
-## Серверный класс (наследование от UnicastRemoteObject)
+### Серверный класс (наследование от UnicastRemoteObject)
+
+<div style="display: flex; gap: 20px; align-items: flex-start;">
+
+<!-- Левая колонка: Код -->
+<div style="flex: 1; text-align: left;">
+
 ```java
 public class RMIServer2 extends UnicastRemoteObject implements Hello {
     public RMIServer2() throws java.rmi.RemoteException {
@@ -203,11 +300,20 @@ public class RMIServer2 extends UnicastRemoteObject implements Hello {
     }
 }
 ```
-Класс наследуется от UnicastRemoteObject и объявляется реализующим методы интерфейса Hello
-В конструкторе вызывается конструктор предка (UnicastRemoteObject )
-Запуск – аналогично предыдущему примеру
+
+</div>
+
+<div style="flex: 1; text-align: left; font-size: 70%;">
+
+- Класс наследуется от UnicastRemoteObject и объявляется реализующим методы интерфейса Hello
+- В конструкторе вызывается конструктор предка (UnicastRemoteObject )
+- Запуск – аналогично предыдущему примеру
+
+</div>
+</div>
+
 ---
-## Промежуточные итоги
+### Промежуточные итоги
 - Создать распределенное приложение с использованием Java RMI очень просто:
     - Нужно определить интерфейс, наследующий от Remote
     - Определить класс, реализующий этот интерфейс
@@ -215,7 +321,7 @@ public class RMIServer2 extends UnicastRemoteObject implements Hello {
     - По которому клиент получит на него объектную ссылку
 
 ---
-## Динамическая загрузка классов
+### Динамическая загрузка классов
 ```java
 public interface RemoteObject extends Remote {
    Figure createFigure(String figureType) throws RemoteException;
@@ -229,9 +335,9 @@ public class Circle extends Figure {...}
 
 public class Rectangle extends Figure {...}
 ```
-При старте приложения оно обладает только представлением класса Figure. Остальные классы (наследники) должны быть загружены динамически
+- При старте приложения оно обладает только представлением класса Figure. Остальные классы (наследники) должны быть загружены динамически
 ---
-## Динамическая загрузка классов
+### Динамическая загрузка классов
 ```java
 public class Server implements RemoteObject{
     public static void main(String[] args) {
@@ -258,7 +364,7 @@ public class Server implements RemoteObject{
 }
 ```
 ---
-## Динамическая загрузка классов. Клиент
+### Динамическая загрузка классов. Клиент
 ```java
 public class Client {
     public static void main(String[] args) {
@@ -279,11 +385,10 @@ public class Client {
     }
 }
 ```
-Обратите внимание на установку SecuityManager
- - без него загрузка классов невозможна
+Обратите внимание на установку SecuityManager - без него загрузка классов невозможна
 
 ---
-## Динамическая загрузка классов. Подготовка к запуску
+### Динамическая загрузка классов. Подготовка к запуску
 - Создаем файл с дополнительными привилегиями (нам нужны разрешения на открытие сетевых соединений для динамически-загруженных классов). 
 ```json
 grant {
@@ -293,7 +398,7 @@ grant {
 ```
 - Обеспечиваем сервис, которые может «отдать» класс по его имени (например, запускаем HTTP сервер и подкладываем ему папку с нашими классами)
 ---
-## Динамическая загрузка классов. Запуск
+### Динамическая загрузка классов. Запуск
 - Запуск сервере не отличается от ранее рассмотренного
 - Запуск клиента
 ```bash
@@ -304,12 +409,12 @@ grant {
     - Djava.security.policy – имя файла с определением дополнительных привелегий
 - При вызове метода createFigure и получении любого наследника от класса Figure, определение реального класса будет загружено по сети из http://localhost:8000/
 ---
-## Примеры
+### Примеры
 - Реализация программы обслуживания сети столовых, с использованием технологии RMI
     - Пример 1: определяется интерфейс, содержащий методы, осуществляющие базовые единичные операции (передача простых типов данных)
     - Пример 2: интерфейс содержит методы, осуществляющие массированные операции (передача пользовательских типов данных с использованием сериализации)
 ---
-## Элементы технологии
+### Элементы технологии
 - Пакет java.rmi
 - Определение удаленного интерфейса
 - Генерация вспомогательных классов
@@ -319,10 +424,11 @@ grant {
 - Разрешение имени с помощью сервиса имен 
 
 ---
-## Пакет java.rmi
-Интерфейс Remote – тэгирующий интерфейс для интерфейсов удаленных вызовов
-Удаленные методы должны быть определены как кидающие исключение RemoteException 
-Класс UnicastRemoteObject – базовый класс для серверного класса
+### Пакет java.rmi
+- Интерфейс Remote – тэгирующий интерфейс для интерфейсов удаленных вызовов
+- Удаленные методы должны быть определены как кидающие исключение RemoteException 
+- Класс UnicastRemoteObject – базовый класс для серверного класса
+
 ```java
 public interface BillingService extends Remote {
  …
@@ -336,7 +442,7 @@ public class BillingServiceImpl extends UnicastRemoteObject implements BillingSe
 ## Первый пример
 Использование простых типов данных в качестве аргументов удаленных методов
 ---
-## Интерфейс BillingService
+### Интерфейс BillingService
 ```java
 package com.asw.rmi.ex1;
 
@@ -351,7 +457,7 @@ public interface BillingService extends Remote {
 
 ```
 ---
-## Класс BillingServiceImpl (начало)
+### Класс BillingServiceImpl (начало)
 ```java
 package com.asw.rmi.ex1;
 
@@ -378,7 +484,7 @@ public class BillingServiceImpl extends UnicastRemoteObject implements BillingSe
 
 ```
 ---
-## Класс BillingServiceImpl (окончание)
+### Класс BillingServiceImpl (окончание)
 ```java
         public void subMoney(String card, double money) throws RemoteException {
   Double d = hash.get(card);
@@ -402,13 +508,13 @@ public class BillingServiceImpl extends UnicastRemoteObject implements BillingSe
 }
 ```
 ---
-## Утилита rmic
+### Утилита rmic
 - rmic -v1.2 -keep com.asw.rmi.ex1.BillingServiceImpl
 - Генерируется класс BillingServiceImpl_Stub
 - Генерируется автоматически
 - Исходный текст уничтожается после компиляции (если не указан параметр -keep)
 ---
-## Класс BillingServiceImpl_Stub
+### Класс BillingServiceImpl_Stub
 ```java
 package com.asw.rmi.ex1;
 public final class BillingServiceImpl_Stub    extends java.rmi.server.RemoteStub     implements com.asw.rmi.ex1.BillingService, java.rmi.Remote {
@@ -437,7 +543,7 @@ public final class BillingServiceImpl_Stub    extends java.rmi.server.RemoteStub
 
 ```
 ---
-## Класс BillingClient
+### Класс BillingClient
 ```java
 package com.asw.rmi.ex1;
 
@@ -464,7 +570,7 @@ public class BillingClient {
 }
 ```
 ---
-## Компиляция и выполнение
+### Компиляция и выполнение
 - Генерация заглушек (не нужна в актуальных версиях JDK)
     - rmic –v1.2 com.asw.rmi.ex1.BillingServiceImpl
 - Запуск сервиса имен
@@ -474,12 +580,12 @@ public class BillingClient {
 - Запуск клиента
     - java com.asw.rmi.ex1.BillingClient 127.0.0.1
 ---
-## Второй пример
+### Второй пример
 - Использование сложных типов данных (пользовательских классов) в качестве аргументов удаленных методов
 - Классы должны быть сериализуемы
 - При передаче в удаленный метод создается копия класса, а не ссылка!
 ---
-## Интерфейс BillingService 
+### Интерфейс BillingService 
 ```java
 package com.asw.rmi.ex2;
 
@@ -494,7 +600,7 @@ public interface BillingService extends Remote {
 
 ```
 ---
-## Класс BillingServiceImpl 
+### Класс BillingServiceImpl 
 ```java
 package com.asw.rmi.ex2;
 
@@ -522,7 +628,7 @@ public class BillingServiceImpl extends UnicastRemoteObject implements BillingSe
 
 ```
 ---
-## Класс BillingServiceImpl (окончание)
+### Класс BillingServiceImpl (окончание)
 ```java
  public Card getCard(String card) throws RemoteException{
   Card c = hash.get(card);
@@ -539,7 +645,7 @@ public class BillingServiceImpl extends UnicastRemoteObject implements BillingSe
 
 ```
 ---
-## Класс Card
+### Класс Card
 ```java
 package com.asw.rmi.ex2;
 
@@ -564,7 +670,7 @@ public class Card implements Serializable{
 
 ```
 ---
-## Класс CardOperation
+### Класс CardOperation
 ```java
 package com.asw.rmi.ex2;
 import java.util.*;
@@ -583,7 +689,7 @@ public class CardOperation implements Serializable {
 
 ```
 ---
-## Класс BillingClient
+### Класс BillingClient
 ```java
 package com.asw.rmi.ex2;
 import java.rmi.*;

@@ -5,22 +5,22 @@
 - Примеры приложений (разработка, компиляция, запуск), использующих эти протокол
 
 ---
-## Примитивы передачи данных
+### Примитивы передачи данных
 - Распределенные системы нуждаются в обмене данными и синхронизации между автономными распределенными процессами
     - Interprocess communication (IPC)
-        - Разделяемые переменные
-        - Передача сообщений
+        - Разделяемые переменные <!-- .element: class="small_font"  -->
+        - Передача сообщений <!-- .element: class="small_font"  -->
 - Синхронизация
     - Процессы на различных компьютерах выполняются с различными скоростями
 - Примитивы передачи данных
-    - send expression_list to destination
-    - receive variable_list from source
+    - send expression_list to destination <!-- .element: class="small_font"  -->
+    - receive variable_list from source <!-- .element: class="small_font"  -->
 - Вопросы
     - Как определять адреса (как указывать процесс, которому передаются данные)?
     - Как добиваться синхронизации при передаче
 
 ---
-## Передача сообщений. Примитивы 
+### Передача сообщений. Примитивы 
 - Каналы (Pipes). Локальный IPC.
     - Давний и один из самых простейших средств IPC 
     - Позволяют двум процессам взаимодействовать, используя буфер, реализуемый ядром ОС; данные сохраняются в буфере в порядке очереди (FIFO) 
@@ -34,7 +34,7 @@
 
 
 ---
-## Передача сообщений. Примитивы 
+### Передача сообщений. Примитивы 
 Сокеты (Socket`s). Распределенный IPC.<!-- .element: class="left" -->
 - Сокеты предоставляют мощнейший механизм взаимодействия распределенных процессов, однако при их использовании требуется аккуратность (на программиста возлагается ответственность за детали взаимодействия)
 - Существуют стандартные интерфейсы, механизм поддерживается на всех значимых платформах
@@ -43,21 +43,25 @@
 
 
 ---
-## Примитивы передачи данных
-Указание назначения (адресата)
-- Прямое наименование: имена процессов получателя и отправителя используются в качестве адресатов (пара имен однозначно определяет канал)
+### Примитивы передачи данных
 
-        - send cur_status to monitor 
-        - receive message from handler
+<div style="flex: 1; text-align: center; font-size: 85%;">
+
+- Прямое наименование: имена процессов получателя и отправителя используются в качестве адресатов (пара имен однозначно определяет канал)
+    ```code
+    - send cur_status to monitor 
+    - receive message from handler 
+    ```
     - Просто реализовать и использовать
     - Позволяет процессу легко контролировать когда получать какое сообщение с какого процесса
     - Используется для реализации клиент-серверных приложений
         - хорошо подходящий способ, чтобы реализовать схему клиент/сервер, если есть один клиент и один сервер
         - в противном случае, сервер должен уметь принимать запросы от любого клиента в любое время,и клиент должен уметь обращаться к множеству сервисов в одно время, если доступно больше одного сервера
+</div>
+
 
 ---
-## Примитивы передачи данных
-Указание назначения (адресата)
+### Примитивы передачи данных
 - глобальные имена или почтовые ящики: независимое имя процесса-приемника может использоваться процессами-источниками
     - Сообщения, посланные в почтовый ящик, могут получаться любым процессом
     - Чтобы реализовать  концепцию клиент-сервера
@@ -66,6 +70,9 @@
         - сообщение послано в ящик
         - если один процесс решил получить сообщение, он должен его заблокировать
         - взаимное исключение при параллельном доступе
+
+---
+### Примитивы передачи данных
 - Порты: почтовый ящик, но только одному процессу разрешаются получать сообщения
     - легко осуществимо - принимать может только один процесс - не нужна блокировка
     - подходит если один сервер и много клиентов
@@ -74,11 +81,14 @@
     - порты соответствуют концепции “много процессов посылают, один принимает”
 
 ---
-## Примитивы передачи сообщений
+### Примитивы передачи сообщений
 Семантика примитивов передачи сообщений
 - Блокировка
     - не блокирующие: вызов не задерживает вызывающий процесс (управление возвращается сразу)
     - блокирующий: вызов не возвращает управление до завершения
+
+---
+### Примитивы передачи сообщений
 - Синхронизация
     - синхронные: нет никакой буферизации
         - процессы синхронизируются по любому сообщению
@@ -88,6 +98,8 @@
         - передающий процесс выполняет передачу неограниченное число раз
         - передающий никогда не блокируется
         - принимающий блокируется на пустой очереди
+---
+### Примитивы передачи сообщений
 - буферизованные: буферизация с ограниченным буфером
     - передающий процесс может передавать до тех пор, пока не переполнился буфер
     - передающий блокируется при переполненном буфере
@@ -95,7 +107,7 @@
 
 
 ---
-## Примитивы передачи сообщений
+### Примитивы передачи сообщений
 Не блокирующие примитивы для асинхронной или буферизированной передачи
 - прием
     - фоновый вариант: процесс продолжает выполняться, при приеме получает прерывание (например, callback)
@@ -105,10 +117,111 @@
     - передающий процесс ожидает освобождения буфера или удаляет из него не посланные сообщения
 
 ---
-## Сокеты. TCP
+### Сокеты. TCP
+
+<div style="display: flex; gap: 20px; align-items: flex-start;">
+
+<!-- Левая колонка: Код -->
+<div style="flex: 1; text-align: left;">
+
+<svg width="100%" height="auto" viewBox="0 0 800 680" xmlns="http://www.w3.org/2000/svg" style="max-width: 800px; display: block; margin: 0 auto; font-family: sans-serif;">
+  <!-- Заголовки -->
+  <text x="150" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="#1e3a8a">Сервер</text>
+  <text x="650" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="#166534">Клиент</text>
+  <!-- ================= ЭТАПЫ СЕРВЕРА (Слева) ================= -->
+  <!-- socket() -->
+  <rect x="60" y="70" width="180" height="50" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="150" y="100" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">socket()</text>
+  <line x1="150" y1="120" x2="150" y2="150" stroke="#9ca3af" stroke-width="2"/>
+  <polygon points="150,150 145,140 155,140" fill="#9ca3af"/>
+  <!-- bind() -->
+  <rect x="60" y="150" width="180" height="50" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="150" y="180" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">bind()</text>
+  <line x1="150" y1="200" x2="150" y2="230" stroke="#9ca3af" stroke-width="2"/>
+  <polygon points="150,230 145,220 155,220" fill="#9ca3af"/>
+  <!-- listen() -->
+  <rect x="60" y="230" width="180" height="50" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="150" y="260" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">listen()</text>
+  <line x1="150" y1="280" x2="150" y2="310" stroke="#9ca3af" stroke-width="2"/>
+  <polygon points="150,310 145,300 155,300" fill="#9ca3af"/>
+  <!-- accept() -->
+  <rect x="60" y="310" width="180" height="50" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="150" y="340" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">accept()</text>
+  <line x1="150" y1="360" x2="150" y2="380" stroke="#9ca3af" stroke-width="2"/>
+  <polygon points="150,380 145,370 155,370" fill="#9ca3af"/>
+  <!-- Блокировка процесса -->
+  <rect x="40" y="380" width="220" height="60" rx="8" fill="#f3f4f6" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="150" y="405" text-anchor="middle" font-size="14" fill="#6b7280">Процесс блокируется</text>
+  <text x="150" y="425" text-anchor="middle" font-size="14" fill="#6b7280">в ожидании клиента</text>
+  <line x1="150" y1="440" x2="150" y2="470" stroke="#9ca3af" stroke-width="2"/>
+  <polygon points="150,470 145,460 155,460" fill="#9ca3af"/>
+  <!-- read() -->
+  <rect x="60" y="470" width="180" height="50" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="150" y="500" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">read()</text>
+  <line x1="150" y1="520" x2="150" y2="550" stroke="#9ca3af" stroke-width="2"/>
+  <polygon points="150,550 145,540 155,540" fill="#9ca3af"/>
+  <!-- write() -->
+  <rect x="60" y="550" width="180" height="50" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="150" y="580" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">write()</text>
+  <!-- ================= ЭТАПЫ КЛИЕНТА (Справа) ================= -->
+  <!-- socket() -->
+  <rect x="560" y="70" width="180" height="50" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="650" y="100" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">socket()</text>
+  <line x1="650" y1="120" x2="650" y2="310" stroke="#9ca3af" stroke-width="2" stroke-dasharray="5,5"/>
+  <polygon points="650,310 645,300 655,300" fill="#9ca3af"/>
+  <!-- connect() -->
+  <rect x="560" y="310" width="180" height="50" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="650" y="340" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">connect()</text>
+  <line x1="650" y1="360" x2="650" y2="470" stroke="#9ca3af" stroke-width="2" stroke-dasharray="5,5"/>
+  <polygon points="650,470 645,460 655,460" fill="#9ca3af"/>
+  <!-- write() -->
+  <rect x="560" y="470" width="180" height="50" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="650" y="500" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">write()</text>
+  <line x1="650" y1="520" x2="650" y2="550" stroke="#9ca3af" stroke-width="2"/>
+  <polygon points="650,550 645,540 655,540" fill="#9ca3af"/>
+  <!-- read() -->
+  <rect x="560" y="550" width="180" height="50" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="650" y="580" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">read()</text>
+  <!-- ================= ВЗАИМОДЕЙСТВИЕ (Стрелки между ними) ================= -->
+  <!-- 1. connect() -> accept() (Установка соединения) -->
+  <line x1="560" y1="335" x2="240" y2="335" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="240,335 250,330 250,340" fill="#6b7280"/>
+  <text x="400" y="325" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">Установка соединения</text>
+  <!-- 2. write() -> read() (Отправка запроса) -->
+  <line x1="560" y1="495" x2="240" y2="495" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="240,495 250,490 250,500" fill="#6b7280"/>
+  <text x="400" y="485" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">Отправка запроса</text>
+  <!-- 3. write() -> read() (Отправка ответа) -->
+  <line x1="240" y1="575" x2="560" y2="575" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="560,575 550,570 550,580" fill="#6b7280"/>
+  <text x="400" y="565" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">Отправка ответа</text>
+</svg>
+
+</div>
+
+<!-- Правая колонка: -->
+<div style="flex: 1; text-align: center; font-size: 70%;">
+
+- Способ взаимодействия, ориентированный на соединение 
+- Сервер: 
+    - Создает сокет 
+    - Связывает его с портом 
+    - Инициирует прослушивание порта
+    - Ожидает соединения клиента
+- Клиент
+    - Создает сокет
+    - Соединяется с сервером (необходимые параметры – адрес сервера и порт)
+- Двунаправленный обмен (+ механизм потоков )
+
+</div>
+</div>
+
+
 
 ---
-## Механизм сокетов
+### Механизм сокетов
+<div style="flex: 1; text-align: center; font-size: 70%;">
+
 - IPC основанный на TCP
     - Абстрактный сервис: поток байт принимается и получается
     - возможности
@@ -123,11 +236,108 @@
     - Создание соединения
         - клиент: запрос коннекта
         - сервер: слушает порт и принимает запросы на соединение. Принимает соединение. Создает новый поток для соединения
----
-## Сокеты. UDP
+
+</div>
 
 ---
-## Механизм сокетов
+### Сокеты. UDP
+
+<div style="display: flex; gap: 20px; align-items: flex-start;">
+
+<!-- Левая колонка: Код -->
+<div style="flex: 1; text-align: left;">
+
+<svg width="100%" height="auto" viewBox="0 0 800 580" xmlns="http://www.w3.org/2000/svg" style="max-width: 800px; display: block; margin: 0 auto; font-family: sans-serif;">
+  <!-- Заголовки -->
+  <text x="150" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="#1e3a8a">Сервер</text>
+  <text x="650" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="#166534">Клиент</text>
+  <!-- ================= ЭТАПЫ СЕРВЕРА (Слева) ================= -->
+  <!-- socket() -->
+  <rect x="60" y="70" width="180" height="50" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="150" y="100" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">socket()</text>
+  <!-- Стрелка вниз -->
+  <line x1="150" y1="120" x2="150" y2="150" stroke="#9ca3af" stroke-width="2"/>
+  <polygon points="150,150 145,140 155,140" fill="#9ca3af"/>
+  <!-- bind() -->
+  <rect x="60" y="150" width="180" height="50" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="150" y="180" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">bind()</text>
+  <!-- Стрелка вниз -->
+  <line x1="150" y1="200" x2="150" y2="230" stroke="#9ca3af" stroke-width="2"/>
+  <polygon points="150,230 145,220 155,220" fill="#9ca3af"/>
+  <!-- recvfrom() -->
+  <rect x="60" y="230" width="180" height="50" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="150" y="260" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">recvfrom()</text>
+  <!-- Стрелка вниз -->
+  <line x1="150" y1="280" x2="150" y2="310" stroke="#9ca3af" stroke-width="2"/>
+  <polygon points="150,310 145,300 155,300" fill="#9ca3af"/>
+  <!-- Блокировка процесса -->
+  <rect x="40" y="310" width="220" height="60" rx="8" fill="#f3f4f6" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="150" y="335" text-anchor="middle" font-size="14" fill="#6b7280">Процесс блокируется</text>
+  <text x="150" y="355" text-anchor="middle" font-size="14" fill="#6b7280">в ожидании данных</text>
+  <!-- Стрелка вниз -->
+  <line x1="150" y1="370" x2="150" y2="400" stroke="#9ca3af" stroke-width="2"/>
+  <polygon points="150,400 145,390 155,390" fill="#9ca3af"/>
+  <!-- Обработка запроса -->
+  <rect x="60" y="400" width="180" height="50" rx="8" fill="#f3f4f6" stroke="#9ca3af" stroke-width="2"/>
+  <text x="150" y="430" text-anchor="middle" font-size="16" fill="#1f2937">Обработка запроса</text>
+  <!-- Стрелка вниз -->
+  <line x1="150" y1="450" x2="150" y2="480" stroke="#9ca3af" stroke-width="2"/>
+  <polygon points="150,480 145,470 155,470" fill="#9ca3af"/>
+  <!-- sendto() -->
+  <rect x="60" y="480" width="180" height="50" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="150" y="510" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">sendto()</text>
+  <!-- ================= ЭТАПЫ КЛИЕНТА (Справа) ================= -->
+  <!-- socket() -->
+  <rect x="560" y="70" width="180" height="50" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="650" y="100" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">socket()</text>
+  <!-- Пунктир ожидания -->
+  <line x1="650" y1="120" x2="650" y2="230" stroke="#9ca3af" stroke-width="2" stroke-dasharray="5,5"/>
+  <polygon points="650,230 645,220 655,220" fill="#9ca3af"/>
+  <!-- sendto() -->
+  <rect x="560" y="230" width="180" height="50" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="650" y="260" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">sendto()</text>
+  <!-- Пунктир ожидания -->
+  <line x1="650" y1="280" x2="650" y2="480" stroke="#9ca3af" stroke-width="2" stroke-dasharray="5,5"/>
+  <polygon points="650,480 645,470 655,470" fill="#9ca3af"/>
+  <!-- recvfrom() -->
+  <rect x="560" y="480" width="180" height="50" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="650" y="510" text-anchor="middle" font-family="monospace" font-size="18" fill="#1f2937">recvfrom()</text>
+  <!-- ================= ВЗАИМОДЕЙСТВИЕ (Стрелки между ними) ================= -->
+  <!-- 1. sendto() -> recvfrom() (Отправка запроса) -->
+  <line x1="560" y1="255" x2="240" y2="255" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="240,255 250,250 250,260" fill="#6b7280"/>
+  <text x="400" y="245" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">Отправка запроса</text>
+  <!-- 2. sendto() -> recvfrom() (Отправка ответа) -->
+  <line x1="240" y1="505" x2="560" y2="505" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="560,505 550,500 550,510" fill="#6b7280"/>
+  <text x="400" y="495" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">Отправка ответа</text>
+</svg>
+
+</div>
+
+<!-- Правая колонка: -->
+<div style="flex: 1; text-align: center; font-size: 70%;">
+
+- Способ взаимодействия, не ориентированный на соединение
+    - Сервер:
+        - Создает сокет
+        - Связывает его с портом
+        - Ожидает сообщение  клиента
+    - Клиент
+        - Создает сокет
+        - Связывает его с портом
+        - Посылает сообщение серверу, указывая адрес сервера и порт
+- Механизм обмена сообщениями
+
+</div>
+</div>
+
+
+---
+### Механизм сокетов
+
+<div style="flex: 1; text-align: center; font-size: 70%;">
+
 - IPC базирующийся на UDP
     - Свойства UDP: нет гарантии порядка сообщений, сообщения теряются и дублируются
     - Необходимые шаги
@@ -136,14 +346,17 @@
             - клиент: произвольный свободный порт
             - сервер: порт сервера
     - Метод приемки: возвращает [Интернет адрес и порт отправителя] + [сообщение]
-    - Размер сообщения: IP разрешает сообщения до 216 = 65536 байт
-        - Большинство реализаций ограничивают 8 Kb
+    - Размер сообщения: IP разрешает сообщения до 2 <sup> 16 </sup> = 65536 байт
+        - Многие реализаций ограничивают 8 Kb
         - Большие сообщения увеличивают производительность передачи
         - Если передаваемое сообщение слишком велико, оно усекается
     - Отправка – не блокирующая 
     - Прием сообщений блокирующий
+
+</div>
+
 ---
-## Прикладные протоколы
+### Прикладные протоколы
  Типы сообщений (пример)
 С – клиент, S – сервер
 
@@ -157,25 +370,191 @@
 |5|(IAA) I am alive |S |C|Ответ сервера о его работоспособности |
 |6|(TA) try again|S|C|Сервер перегружен и не имеет ресурсов для обработки запроса |
 ---
-## Прикладные протоколы
+### Прикладные протоколы
 - Основными типами сообщений являются типы 1 и 2 
 - Тип 3 служит для повышения надежности 
 - Типы 4-6: не обязательны, но добавляют дополнительную функциональность
 - Необходимость в типах 4-5: Предположим, что клиент послал запрос. Что, если нет ответа, за приемлемое время? Сервер все еще работает или сервер потерпел крах?
     - Клиент использует AYA сообщение для проверки сервера, если IAA (или REP) сообщение получено, значит все в порядке;  Иначе, если после нескольких  AYA сообщений, нет  обратных IAA/REP, клиент может предположить, что сервер недоступен
 ---
-## Примеры
+### Примеры
+
+<svg width="100%" height="auto" viewBox="0 0 900 650" xmlns="http://www.w3.org/2000/svg" style="max-width: 900px; display: block; margin: 0 auto; font-family: sans-serif;">
+  <!-- ========================================== -->
+  <!-- 1. ПРОСТОЙ ПРОТОКОЛ (Верхний левый)         -->
+  <!-- ========================================== -->
+  <!-- Заголовки -->
+  <rect x="70" y="30" width="60" height="30" rx="5" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="100" y="50" text-anchor="middle" font-size="14" font-weight="bold" fill="#166534">Клиент</text>
+  <rect x="320" y="30" width="60" height="30" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="350" y="50" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Сервер</text>
+  <!-- Линии времени -->
+  <line x1="100" y1="60" x2="100" y2="250" stroke="#22c55e" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="350" y1="60" x2="350" y2="250" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5,5"/>
+  <!-- REQ (Клиент -> Сервер) -->
+  <line x1="110" y1="110" x2="340" y2="110" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="340,110 330,105 330,115" fill="#6b7280"/>
+  <text x="225" y="100" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">REQ</text>
+  <!-- REP (Сервер -> Клиент) -->
+  <line x1="340" y1="170" x2="110" y2="170" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="110,170 120,165 120,175" fill="#6b7280"/>
+  <text x="225" y="160" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">REP</text>
+  <!-- Название протокола -->
+  <text x="225" y="290" text-anchor="middle" font-size="16" fill="#1f2937" font-weight="bold">Простой протокол</text>
+  <!-- ========================================== -->
+  <!-- 2. ПОДТВЕРЖДЕНИЕ КАЖДОГО СООБЩЕНИЯ (Верхний правый) -->
+  <!-- ========================================== -->
+  <!-- Заголовки -->
+  <rect x="520" y="30" width="60" height="30" rx="5" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="550" y="50" text-anchor="middle" font-size="14" font-weight="bold" fill="#166534">Клиент</text>
+  <rect x="770" y="30" width="60" height="30" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="800" y="50" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Сервер</text>
+  <!-- Линии времени -->
+  <line x1="550" y1="60" x2="550" y2="250" stroke="#22c55e" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="800" y1="60" x2="800" y2="250" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5,5"/>
+  <!-- REQ -->
+  <line x1="560" y1="100" x2="790" y2="100" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="790,100 780,95 780,105" fill="#6b7280"/>
+  <text x="675" y="90" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">REQ</text>
+  <!-- ACK -->
+  <line x1="790" y1="140" x2="560" y2="140" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="560,140 570,135 570,145" fill="#6b7280"/>
+  <text x="675" y="130" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">ACK</text>
+  <!-- REP -->
+  <line x1="790" y1="190" x2="560" y2="190" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="560,190 570,185 570,195" fill="#6b7280"/>
+  <text x="675" y="180" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">REP</text>
+  <!-- ACK -->
+  <line x1="560" y1="230" x2="790" y2="230" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="790,230 780,225 780,235" fill="#6b7280"/>
+  <text x="675" y="220" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">ACK</text>
+  <!-- Название протокола -->
+  <text x="675" y="290" text-anchor="middle" font-size="16" fill="#1f2937" font-weight="bold">С подтверждением каждого сообщения</text>
+  <!-- ========================================== -->
+  <!-- 3. ПОДТВЕРЖДЕНИЕ ЗАПРОСА (Нижний левый)     -->
+  <!-- ========================================== -->
+  <!-- Заголовки -->
+  <rect x="70" y="340" width="60" height="30" rx="5" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="100" y="360" text-anchor="middle" font-size="14" font-weight="bold" fill="#166534">Клиент</text>
+  <rect x="320" y="340" width="60" height="30" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="350" y="360" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Сервер</text>
+  <!-- Линии времени -->
+  <line x1="100" y1="370" x2="100" y2="560" stroke="#22c55e" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="350" y1="370" x2="350" y2="560" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5,5"/>
+  <!-- REQ -->
+  <line x1="110" y1="410" x2="340" y2="410" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="340,410 330,405 330,415" fill="#6b7280"/>
+  <text x="225" y="400" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">REQ</text>
+  <!-- ACK -->
+  <line x1="340" y1="460" x2="110" y2="460" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="110,460 120,455 120,465" fill="#6b7280"/>
+  <text x="225" y="450" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">ACK</text>
+  <!-- REP -->
+  <line x1="340" y1="510" x2="110" y2="510" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="110,510 120,505 120,515" fill="#6b7280"/>
+  <text x="225" y="500" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">REP</text>
+  <!-- Название протокола -->
+  <text x="225" y="600" text-anchor="middle" font-size="16" fill="#1f2937" font-weight="bold">С подтверждением получения запроса</text>
+  <!-- ========================================== -->
+  <!-- 4. ЖИВУЧЕСТЬ И ФУНКЦИОНАЛЬНОСТЬ (Нижний правый) -->
+  <!-- ========================================== -->
+  <!-- Заголовки -->
+  <rect x="520" y="340" width="60" height="30" rx="5" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="550" y="360" text-anchor="middle" font-size="14" font-weight="bold" fill="#166534">Клиент</text>
+  <rect x="770" y="340" width="60" height="30" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="800" y="360" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Сервер</text>
+  <!-- Линии времени -->
+  <line x1="550" y1="370" x2="550" y2="580" stroke="#22c55e" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="800" y1="370" x2="800" y2="580" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5,5"/>
+  <!-- AYA (Are You Alive) -->
+  <line x1="560" y1="400" x2="790" y2="400" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="790,400 780,395 780,405" fill="#6b7280"/>
+  <text x="675" y="390" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">AYA</text>
+  <!-- IAA (I Am Alive) -->
+  <line x1="790" y1="440" x2="560" y2="440" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="560,440 570,435 570,445" fill="#6b7280"/>
+  <text x="675" y="430" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">IAA</text>
+  <!-- REQ -->
+  <line x1="560" y1="480" x2="790" y2="480" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="790,480 780,475 780,485" fill="#6b7280"/>
+  <text x="675" y="470" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">REQ</text>
+  <!-- ACK -->
+  <line x1="790" y1="520" x2="560" y2="520" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="560,520 570,515 570,525" fill="#6b7280"/>
+  <text x="675" y="510" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">ACK</text>
+  <!-- REP -->
+  <line x1="790" y1="560" x2="560" y2="560" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="560,560 570,555 570,565" fill="#6b7280"/>
+  <text x="675" y="550" text-anchor="middle" font-size="14" fill="#374151" font-weight="bold">REP</text>
+  <!-- Название протокола -->
+  <text x="675" y="610" text-anchor="middle" font-size="16" fill="#1f2937" font-weight="bold">С обеспечением живучести (AYA/IAA)</text>
+</svg>
 
 ---
-## Java API для UDP (java.net)
+### Java API для UDP (java.net)
+
+<div style="flex: 1; text-align: center; font-size: 80%;">
+
 - Класс DatagramPacket 
     - Представляет собой пакет для передачи по сети. Обычно содержит адрес и порт процесса-получателя
 - Класс DatagramSocket 
     - Служит для получения и отправки пакетов данных посредством UDP
     - send (DatagramPacket dp) отправляет пакет
     - receive(DatagramPacket p) принимает пакет
+
+</div>
+
+<svg width="50%" height="auto" viewBox="0 0 700 450" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 0 auto; font-family: sans-serif;">
+  <!-- ================= ГОЛОВНЫЕ БЛОКИ (Участники) ================= -->
+  <!-- Application -->
+  <rect x="50" y="20" width="120" height="40" rx="4" fill="#f3f4f6" stroke="#6b7280" stroke-width="2"/>
+  <text x="110" y="45" text-anchor="middle" font-size="14" font-weight="bold" fill="#1f2937">Application</text>
+  <!-- DatagramSocket -->
+  <rect x="280" y="20" width="140" height="40" rx="4" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="350" y="45" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">:DatagramSocket</text>
+  <!-- DatagramPacket dp -->
+  <rect x="510" y="20" width="140" height="40" rx="4" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="580" y="45" text-anchor="middle" font-size="14" font-weight="bold" fill="#166534">dp:DatagramPacket</text>
+  <!-- ================= ЛИНИИ ЖИЗНИ (Lifelines) ================= -->
+  <line x1="110" y1="60" x2="110" y2="420" stroke="#6b7280" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="350" y1="60" x2="350" y2="420" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="580" y1="60" x2="580" y2="420" stroke="#22c55e" stroke-width="2" stroke-dasharray="5,5"/>
+  <!-- ================= ПОЛОСЫ АКТИВАЦИИ (Activation boxes) ================= -->
+  <!-- Application (активна всё время) -->
+  <rect x="105" y="80" width="10" height="320" fill="#e5e7eb" stroke="#9ca3af" stroke-width="1"/>
+  <!-- Socket (активен после создания) -->
+  <rect x="345" y="130" width="10" height="270" fill="#bfdbfe" stroke="#3b82f6" stroke-width="1"/>
+  <!-- Packet (активен после создания) -->
+  <rect x="575" y="210" width="10" height="190" fill="#bbf7d0" stroke="#22c55e" stroke-width="1"/>
+  <!-- ================= СООБЩЕНИЯ (Messages) ================= -->
+  <!-- 1. new (Application -> Socket) -->
+  <line x1="115" y1="110" x2="340" y2="110" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="340,110 330,105 330,115" fill="#6b7280"/>
+  <!-- Плашка текста -->
+  <rect x="200" y="95" width="40" height="20" rx="4" fill="white" stroke="#d1d5db" stroke-width="1"/>
+  <text x="220" y="110" text-anchor="middle" font-size="14" font-weight="bold" fill="#374151">new</text>
+  <text x="220" y="128" text-anchor="middle" font-size="12" fill="#6b7280">(создание сокета)</text>
+  <!-- 2. new (Application -> Packet) -->
+  <line x1="115" y1="190" x2="570" y2="190" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="570,190 560,185 560,195" fill="#6b7280"/>
+  <!-- Плашка текста -->
+  <rect x="300" y="175" width="40" height="20" rx="4" fill="white" stroke="#d1d5db" stroke-width="1"/>
+  <text x="320" y="190" text-anchor="middle" font-size="14" font-weight="bold" fill="#374151">new</text>
+  <text x="320" y="208" text-anchor="middle" font-size="12" fill="#6b7280">(создание пакета dp)</text>
+  <!-- 3. send(dp) (Application -> Socket) -->
+  <line x1="115" y1="290" x2="340" y2="290" stroke="#6b7280" stroke-width="2"/>
+  <polygon points="340,290 330,285 330,295" fill="#6b7280"/>
+  <!-- Плашка текста -->
+  <rect x="190" y="275" width="80" height="20" rx="4" fill="white" stroke="#d1d5db" stroke-width="1"/>
+  <text x="230" y="290" text-anchor="middle" font-size="14" font-weight="bold" fill="#374151">send(dp)</text>
+  <text x="230" y="308" text-anchor="middle" font-size="12" fill="#6b7280">(передача данных)</text>
+</svg>
+
 ---
-## Пример использования UDP (java.net)
+### Пример использования UDP (java.net)
+
+<div style="flex: 1; text-align: center; font-size: 70%;">
+
 - Сервер
     - Создает DatagramSocket и связывает его с определенным портом
     - Ожидает сообщение от клиента 
@@ -188,8 +567,11 @@
     - Передает пакет на сервер
     - Ожидает сообщение от сервера
     - Печатает пришедшее сообщение
+
+</div>
+
 ---
-## Клиент (UDP, java.net)
+### Клиент (UDP, java.net)
 ```java
 import java.net.*;
 import java.io.*;
@@ -219,7 +601,7 @@ public class UDPClient{
 ```
 
 ---
-## Сервер (UDP, java.net)
+### Сервер (UDP, java.net)
 ```java
 import java.net.*;
 import java.io.*;
@@ -244,7 +626,7 @@ public class UDPServer {
 }
 ```
 ---
-## Сервер (UDP, java.net)
+### Сервер (UDP, java.net)
 - ServerSocket представляет сокет на стороне сервера
     - В конструкторе принимает порт, на котором будут ожидаться соединения клиентов
     - Для ожидания клиентов вызывает блокирующий метод accept, возвращающий Socket
@@ -253,7 +635,79 @@ public class UDPServer {
     - Методы для работы с входными и выходными потоками
 
 ---
-## Пример использования TCP (java.net)
+### Java API для TCP
+
+<div style="flex: 1; text-align: center; font-size: 70%;">
+
+- ServerSocket представляет сокет на стороне сервера
+    - В конструкторе принимает порт, на котором будут ожидаться соединения клиентов
+    - Для ожидания клиентов вызывает блокирующий метод accept, возвращающий Socket
+- Socket класс для работы с соединением (клиент и сервер)
+    - Конструктор для создания сокета и соединения с удаленным узлом и портом 
+    - Методы для работы с входными и выходными потоками
+
+</div>
+
+
+<svg width="70%" height="auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 480" font-family="Segoe UI, Arial, sans-serif" font-size="13px">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+    </marker>
+    <style>
+      .participant { fill: #f8f9fa; stroke: #dee2e6; stroke-width: 1.5; }
+      .lifeline { stroke: #adb5bd; stroke-dasharray: 4 4; stroke-width: 1.5; }
+      .activation { fill: #e9ecef; stroke: #adb5bd; stroke-width: 1; }
+      .msg { stroke: #333; stroke-width: 1.5; fill: none; }
+      .note { fill: #fff3cd; stroke: #ffe69c; stroke-width: 1; }
+      .note-text { fill: #664d03; }
+      .text { fill: #333; }
+    </style>
+  </defs>
+  <!-- Participants -->
+  <rect x="50" y="20" width="200" height="40" rx="5" class="participant"/>
+  <text x="150" y="45" text-anchor="middle" font-weight="bold" class="text">Client Application</text>
+  <rect x="350" y="20" width="200" height="40" rx="5" class="participant"/>
+  <text x="450" y="45" text-anchor="middle" font-weight="bold" class="text">Server Application</text>
+  <!-- Lifelines -->
+  <line x1="150" y1="60" x2="150" y2="460" class="lifeline"/>
+  <line x1="450" y1="60" x2="450" y2="460" class="lifeline"/>
+  <!-- Server Activation (accept blocks) -->
+  <rect x="446" y="90" width="8" height="180" class="activation"/>
+  <!-- 1. Server calls accept() -->
+  <path d="M 450 90 L 490 90 L 490 105 L 458 105" class="msg" marker-end="url(#arrow)"/>
+  <text x="495" y="102" class="text">accept()</text>
+  <!-- Note 1 -->
+  <path d="M 480 120 L 780 120 L 780 180 L 480 180 Z" class="note"/>
+  <path d="M 770 120 L 780 120 L 780 130 Z" fill="#ffe69c" stroke="#f8d775" stroke-width="1"/>
+  <text x="490" y="140" class="note-text">Метод accept() блокирует вызывающий</text>
+  <text x="490" y="155" class="note-text">поток до тех пор, пока не будет</text>
+  <text x="490" y="170" class="note-text">установлено соединение.</text>
+  <!-- 2. Client creates Socket -->
+  <path d="M 150 210 L 110 210 L 110 225 L 142 225" class="msg" marker-end="url(#arrow)"/>
+  <text x="105" y="222" text-anchor="end" class="text">new Socket()</text>
+  <!-- 3. Connection Request -->
+  <line x1="150" y1="260" x2="446" y2="260" class="msg" marker-end="url(#arrow)"/>
+  <text x="298" y="250" text-anchor="middle" class="text">Запрос на соединение</text>
+  <!-- 4. Connection Established / Returns Socket -->
+  <line x1="446" y1="310" x2="154" y2="310" class="msg" marker-end="url(#arrow)"/>
+  <text x="298" y="300" text-anchor="middle" class="text">Соединение установлено</text>
+  <!-- Client Activation -->
+  <rect x="146" y="310" width="8" height="40" class="activation"/>
+  <!-- Note 2 -->
+  <path d="M 200 340 L 420 340 L 420 380 L 200 380 Z" class="note"/>
+  <path d="M 410 340 L 420 340 L 420 350 Z" fill="#ffe69c" stroke="#f8d775" stroke-width="1"/>
+  <text x="310" y="365" text-anchor="middle" class="note-text">Два сокета теперь соединены.</text>
+</svg>
+
+
+
+
+---
+### Пример использования TCP (java.net)
+
+<div style="flex: 1; text-align: center; font-size: 80%;">
+
 - Сервер
     - Создает ServerSocket, связывает его с портом, на котором будут ожидаться клиенты
     - Ожидает клиентов (accept)
@@ -265,8 +719,11 @@ public class UDPServer {
     - Создает потоки ввода и вывода, связанные с сокетом
     - Записывает в поток вывода (пересылает на сервер) строку, а затем читает из потока ввода (принимает от сервера) ответ
     - Печатает ответ
+
+</div>
+
 ---
-## Клиент (TCP, java.net)
+### Клиент (TCP, java.net)
 ```java
 import java.net.*;
 import java.io.*;
@@ -292,7 +749,7 @@ public class TCPClient {
 }
 ```
 ---
-## Сервер (TCP, java.net) [начало]
+### Сервер (TCP, java.net) [начало]
 ```java
 import java.net.*;
 import java.io.*;
@@ -311,7 +768,7 @@ public class TCPServer {
 }
 ```
 ---
-## Сервер (TCP, java.net) [окончание]
+### Сервер (TCP, java.net) [окончание]
 ```java
 class ClientConnection extends Thread {
  DataInputStream in;
@@ -338,7 +795,7 @@ class ClientConnection extends Thread {
 }
 ```
 ---
-## Немного доработаем сервер
+### Немного доработаем сервер
 ```java
 package net.tcp;
 
@@ -379,7 +836,7 @@ public class SmartTCPServer {
 ```
 
 ---
-## Полезные классы. URL (java.net)
+### Полезные классы. URL (java.net)
 - Класс java.net.URL представляет собой идентификатор ресурса – Uniform Resource Locator
 - Включает в себя протокол и имя ресурса
 - Имя ресурса:
@@ -390,24 +847,32 @@ public class SmartTCPServer {
 - Пример:
     - https://www.yandex.ru:443/search/?text=Java
 ---
-## URL (java.net)
-Создание абсолютного URL из строки
+### URL (java.net)
+
+Создание абсолютного URL из строки <!-- .element: class="left" -->
+
 ```java
 URL url = new URL("https://www.yandex.ru/"); 
 ```
-Создание абсолютного URL по частям
+
+Создание абсолютного URL по частям <!-- .element: class="left" -->
+
 ```java
 URL yandex = new URL("https", “www.Yandex.ru", 443, “search/?text=java"); 
 ```
-Создание относительного URL
+
+Создание относительного URL <!-- .element: class="left" -->
+
 ```java
 URL baseURL = new URL("https://www.Yandex.ru/search/"); 
 URL search1URL = new URL(baseURL, "?text=Java"); 
 URL search2URL = new URL(baseURL, " ?text=Oracle"); 
 ```
-После создания URL не может быть изменен
+
+После создания URL не может быть изменен <!-- .element: class="left" -->
+
 ---
-## URL (java.net)
+### URL (java.net)
 ```java
 public class UrlMain {
     public static void main(String[] args) throws Exception{
@@ -430,18 +895,21 @@ public class UrlMain {
 }
 ```
 ---
-## Передача данных в гетерогенных системах
-Проблема передачи данных
+### Передача данных в гетерогенных системах
+Проблема передачи данных <!-- .element: class="left" -->
 - Информация, представленная как данные определяется внутри процесса
 - Информация в сообщениях состоит только из последовательностей байтов
 - Разные платформы по разному представляют примитивные типы
     - integers (big-endian &little-endian)
     - floating-point numbers
     - characters (ASCII & Unicode)
-Данные должны быть упакованы перед передачей и восстановлены по прибытию
+- Данные должны быть упакованы перед передачей и восстановлены по прибытию
 ---
-## Передача данных в гетерогенных системах
-Представление данных
+### Передача данных в гетерогенных системах
+
+<div style="flex: 1; text-align: center; font-size: 80%;">
+
+Представление данных <!-- .element: class="left" -->
 - Решение проблемы представления данных
     - Соглашение об использовании внешнего представления – два преобразования
     - Используется формат источника или приемщика – одно преобразование
@@ -452,12 +920,18 @@ public class UrlMain {
     - SUN Microsystems XDR (eXternal Data Representation)
     - CORBA CDR (Common Data Representation)
     - ASN.1 (OSI layer 6)
+
+</div>
+
+---
+### Передача данных в гетерогенных системах
+
 - marshalling/unmarshalling
     - marshalling: преобразование исходных данных к виду, удобному для передачи
     - unmarshalling: восстановление исходных данных
     - Обычно выполняется промежуточным программным обеспечением (middleware)
 ---
-## Предварительные итоги
+### Предварительные итоги
 - Пакет java.net предоставляет возможность работать с протоколами UDP и TCP
 - Протокол TCP является надежным протоколом
     - Для  обмена данными используется механизм потоков (Stream)
@@ -465,16 +939,26 @@ public class UrlMain {
     - Обмен пакетами данных
     - Возможно использование прикладных протоколов поверх UDP, обеспечивающих нужный уровень надежности 
 ---
-## Примеры
+### Примеры
 - Пример распределенной системы с использованием API java.net.
 - Задачи:
     - Научиться передавать данные простых типов с использованием  API java.net
     - Научиться передавать данные сложных типов с использованием  API java.net и сериализации
 ---
-## Описание задачи
-Имеется сеть столовых. Необходимо разработать систему, автоматизирующую участок работы, связанный с обслуживанием пластиковых карт. В указанных столовых предусмотрен дополнительный сервис: постоянным клиентам выдают пластиковые карты, при предъявлении которых клиент получает существенную скидку. При этом на карту можно положить некоторую сумму денег и расплачиваться за обеды не наличными, а средствами, находящимися на карте. В целях экономии затрат на эмиссию карты закуплены не чиповые, а штриховые (такая карта несет только код – идентификатор клиента). Карта, выданная в одной столовой, может использоваться в другой столовой. Между столовыми нет устойчивых защищенных каналов связи, в связи с этим встает проблема передачи баланса карт между столовыми. Кроме того, в будущем, руководство предполагает изучать предпочтения клиентов, чтобы формировать более гибкую ценовую политику и более рационально управлять ассортиментом предлагаемых блюд.
+### Описание задачи
+
+<div style="flex: 1; text-align: center; font-size: 80%;">
+
+Имеется сеть столовых. <br> Необходимо разработать систему, автоматизирующую участок работы, связанный с обслуживанием пластиковых карт. <br>
+В указанных столовых предусмотрен дополнительный сервис: постоянным клиентам выдают пластиковые карты, при предъявлении которых клиент получает существенную скидку. <br>
+При этом на карту можно положить некоторую сумму денег и расплачиваться за обеды не наличными, а средствами, находящимися на карте. <br>
+В целях экономии затрат на эмиссию карты закуплены не чиповые, а штриховые (такая карта несет только код – идентификатор клиента). <br>
+Карта, выданная в одной столовой, может использоваться в другой столовой. Между столовыми нет устойчивых защищенных каналов связи, в связи с этим встает проблема передачи баланса карт между столовыми. Кроме того, в будущем, руководство предполагает изучать предпочтения клиентов, чтобы формировать более гибкую ценовую политику и более рационально управлять ассортиментом предлагаемых блюд. <!-- .element: class="left" -->
+
+</div>
+
 ---
-## Обсуждение
+### Обсуждение
 - Операции
     - Выдача новой карты
     - Пополнение счета
@@ -484,12 +968,37 @@ public class UrlMain {
     - Одновременное обслуживание сервером нескольких столовых
     - Передача «пакетов» данных (связь неустойчивая)
 ---
-## Обсуждение
+### Обсуждение
+
+<div style="display: flex; gap: 20px; align-items: flex-start;">
+
+<!-- Левая колонка: Код -->
+<div style="flex: 1; text-align: left;">
+
 - Архитектура системы
+
+<br> <br> <br> <br> <br> <br> <br>
+
 - Формат сообщения
 
+</div>
+
+<!-- Правая колонка: -->
+<div style="flex: 1; text-align: center; font-size: 70%;">
+
+![Arch](../img/TCPUDPArch.png) <br>
+
+| Код операции | Данные |
+|--------------|--------|
+|  <код операции> | <параметры операции>  |
+
+</div>
+</div>
+
+
+
 ---
-## Класс BillingService (начало)
+### Класс BillingService (начало)
 ```java
 package com.asw.net.ex1;
 import java.net.*;
@@ -516,7 +1025,7 @@ public class BillingService extends Thread{
  }
 ```
 ---
-## Класс BillingService (окончание)
+### Класс BillingService (окончание)
 ```java
  public void run(){
      try {
@@ -542,7 +1051,7 @@ public class BillingService extends Thread{
 }
 ```
 ---
-## Класс BillingClientService (начало)
+### Класс BillingClientService (начало)
 ```java
 package com.asw.net.ex1;
 import java.io.*;
@@ -568,7 +1077,7 @@ public class BillingClientService extends Thread {
  }
 ```
 ---
-## Класс BillingClientService (окончание)
+### Класс BillingClientService (окончание)
 ```java
  void addNewCard() throws IOException{
   String personName = dis.readUTF();
@@ -593,7 +1102,7 @@ public class BillingClientService extends Thread {
 }
 ```
 ---
-## Класс BillingClient (начало)
+### Класс BillingClient (начало)
 ```java
 package com.asw.net.ex1;
 import java.net.*;
@@ -618,7 +1127,7 @@ public class BillingClient {
         dos = new DataOutputStream(s.getOutputStream());}  
 ```
 ---
-## Класс BillingClient (окончание)
+### Класс BillingClient (окончание)
 ```java
  void sendNewCardOperation(String personName, String card) throws IOException{
   dos.writeInt(BillingService.ADD_NEW_CARD);
@@ -646,7 +1155,7 @@ public class BillingClient {
 }
 ```
 ---
-## Обсуждение результатов
+### Обсуждение результатов
 - Используемый прикладной протокол
     - Низкая надежность
     - Сложность поддержки
@@ -657,17 +1166,17 @@ public class BillingClient {
     - Другой прикладной протокол
     - Механизм блокировки ресурсов
 ---
-## Прикладной протокол
+### Прикладной протокол
 - Сериализация Java
     - Сериализуются значения полей
     - Необходимо реализовывать интерфейс Serializable
     - Интерфейс Serializable - тэгирующий
 ---
-## Классы – «сообщения»
+### Классы – «сообщения»
 - Карта (владелец; дата выдачи; номер карты; баланс )
 - Операция по изменению баланса (номер карты; сумма; дата операции)
 ---
-## Класс Card
+### Класс Card
 ```java
 package com.asw.net.ex2;
 import java.io.Serializable;
@@ -691,7 +1200,7 @@ public class Card implements Serializable{
 }
 ```
 ---
-## Класс CardOperation
+### Класс CardOperation
 ```java
 package com.asw.net.ex2;
 import java.util.*;
@@ -738,7 +1247,7 @@ public class BillingService extends Thread{
  }
 ```
 ---
-## Класс BillingService (окончание)
+### Класс BillingService (окончание)
 ```java
  public void addNewCard(Card card) {
   hash.put(card.cardNumber, card);
@@ -761,7 +1270,7 @@ public class BillingService extends Thread{
 }
 ```
 ---
-## Класс BillingClientService
+### Класс BillingClientService
 ```java
 package com.asw.net.ex2;
 import java.io.*;
@@ -792,7 +1301,7 @@ public class BillingClientService extends Thread {
 }
 ```
 ---
-## Класс BillingClient (начало)
+### Класс BillingClient (начало)
 ```java
 package com.asw.net.ex2;
 import java.net.*;
@@ -825,7 +1334,7 @@ public class BillingClient {
  } 
 ```
 ---
-## Класс BillingClient (окончание)
+### Класс BillingClient (окончание)
 ```java
  void processOperation(CardOperation[] co) throws IOException{
   System.out.println(co);
@@ -851,7 +1360,7 @@ public class BillingClient {
 }
 ```
 ---
-## Итоги
+### Итоги
 - API java.net позволяет реализовывать распределенные приложения
 - Выбор прикладного протокола – важная часть проектирования 
 - Обеспечение корректной работы в параллельной среде – необходимая часть реализации распределенного приложения

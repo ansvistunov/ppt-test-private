@@ -813,7 +813,7 @@ public class HelloClient {
 ### Сервер приложений
 
 
-<img src="../img/SOAPServerApp2.png" alt="SOAPServerApp2" style="width: 80%; height: auto;">
+<img src="../img/SOAPServerAPP2.png" alt="SOAPServerApp2" style="width: 80%; height: auto;">
 
 ---
 ### GlassFish
